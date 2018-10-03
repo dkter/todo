@@ -12,4 +12,4 @@ Simple to-do list app for Android.
 ![](screenshot.png)
 
 ## Download
-Coming soon...
+[Android APK download - install at your own risk](https://github.com/dkter/todo/releases/download/1.0/todo.apk)

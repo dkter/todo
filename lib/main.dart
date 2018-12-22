@@ -118,10 +118,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                     delete(item);
                 });
-                update();
 
-                Scaffold.of(context).showSnackBar(
-                    new SnackBar(content: new Text(item.text + " deleted")));
+                var deletion_snackbar = new SnackBar(
+                    content: Text(item.text + " deleted"),
+                    action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                            setState(() {
+                                _items.add(item);
+                            });
+                        }
+                    )
+                );
+
+                update();
+                Scaffold.of(context).showSnackBar(deletion_snackbar);
             },
             resizeDuration: null,
             dismissThresholds: _dismissThresholds(),

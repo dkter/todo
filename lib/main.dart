@@ -115,8 +115,9 @@ class _MyHomePageState extends State<MyHomePage> {
             key: new Key(item.id.toString()),
             direction: DismissDirection.horizontal,
             onDismissed: (DismissDirection direction) {
+                int deleted_index;
                 setState(() {
-                    delete(item);
+                    deleted_index = delete(item);
                 });
 
                 var deletion_snackbar = new SnackBar(
@@ -125,7 +126,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         label: 'Undo',
                         onPressed: () {
                             setState(() {
-                                _items.add(item);
+                                // reinsert item
+                                _items.insert(deleted_index, item);
                             });
                         }
                     )
@@ -141,14 +143,14 @@ class _MyHomePageState extends State<MyHomePage> {
         );
     }
 
-    update() {
+    void update() {
         String json = Item.listToJson(_items);
         _getItemFile().then((File file) {
             file.writeAsString(json);
         });
     }
 
-    updateLocal() {
+    void updateLocal() {
         _readItemData().then((List<Item> items) {
             setState(() {
                 _items = items;
@@ -156,8 +158,11 @@ class _MyHomePageState extends State<MyHomePage> {
         });
     }
 
-    delete(Item item) {
-        _items.removeWhere((i) => i.id == item.id);
+    int delete(Item item) {
+        // Returns the index of the deleted item, for reinsertion purposes
+        int index = _items.indexWhere((i) => i.id == item.id);
+        _items.removeAt(index);
+        return index;
     }
 
     @override

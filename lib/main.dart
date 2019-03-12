@@ -17,23 +17,16 @@ import 'package:path_provider/path_provider.dart';
 import 'item.dart';
 import 'leave_behind.dart';
 
+String FILENAME = "todo.txt";
+
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
-    // This widget is the root of your application.
     @override
     Widget build(BuildContext context) {
         return new MaterialApp(
             title: 'Todo',
             theme: new ThemeData(
-                // This is the theme of your application.
-                //
-                // Try running your application with "flutter run". You'll see the
-                // application has a blue toolbar. Then, without quitting the app, try
-                // changing the primarySwatch below to Colors.green and then invoke
-                // "hot reload" (press "r" in the console where you ran "flutter run",
-                // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-                // counter didn't reset back to zero; the application is not restarted.
                 primarySwatch: Colors.blue,
             ),
             home: new MyHomePage(title: 'Todo'),
@@ -46,15 +39,6 @@ _MyHomePageState _myHomePageState = new _MyHomePageState();
 class MyHomePage extends StatefulWidget {
     MyHomePage({Key key, this.title}) : super(key: key);
 
-    // This widget is the home page of your application. It is stateful, meaning
-    // that it has a State object (defined below) that contains fields that affect
-    // how it looks.
-
-    // This class is the configuration for the state. It holds the values (in this
-    // case the title) provided by the parent (in this case the App widget) and
-    // used by the build method of the State. Fields in a Widget subclass are
-    // always marked "final".
-
     final String title;
 
     @override
@@ -63,6 +47,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
     List<Item> _items = <Item>[];
+    TextEditingController newItemController;
 
     @override
     void initState() {
@@ -72,6 +57,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 _items = items;
             });
         });
+
+        newItemController = new TextEditingController();
     }
 
     Map<DismissDirection, double> _dismissThresholds() {
@@ -80,22 +67,70 @@ class _MyHomePageState extends State<MyHomePage> {
         return map;
     }
 
-    Future<Null> _addItem() async {
-        setState(() {
-            // This call to setState tells the Flutter framework that something has
-            // changed in this State, which causes it to rerun the build method below
-            // so that the display can reflect the updated values. If we changed
-            // _counter without calling setState(), then the build method would not be
-            // called again, and so nothing would appear to happen.
-            _items.add(new Item(_items.length, ""));
+    Future<Null> _addItem(BuildContext context) async {
+        /*
+        // "add item" modal (bottom sheet)
+        showModalBottomSheet(context: context, builder: (BuildContext context) {
+            return new Container(
+                margin: const EdgeInsets.all(16.0),
+                child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                        new Padding(
+                            padding: EdgeInsets.only(bottom: 16.0),
+                            child: new Text(
+                                "Add an item",
+                                style: new TextStyle(fontSize: 24.0)),
+                        ),
+                        new TextField(),
+                    ],
+                )
+            );
         });
+        */
+        // "add item" modal (dialog)
+        showDialog(context: context, builder: (BuildContext context) {
+            return new AlertDialog(
+                title: const Text("Add an item"),
+                content: new SingleChildScrollView(
+                    child: new Form(
+                        child: new ListBody(
+                            children: <Widget>[
+                                new TextFormField(
+                                    decoration: new InputDecoration(labelText: "Title"),
+                                    controller: newItemController,
+                                ),
+                            ],
+                        ),
+                    ),
+                ),
+                actions: <Widget>[
+                    new FlatButton(
+                        child: new Text("Cancel"),
+                        onPressed: Navigator.of(context).pop,  // dismiss dialog
+                    ),
+                    new FlatButton(
+                        child: new Text("Ok"),
+                        onPressed: () {
+                            setState(() {
+                                // add item to list
+                                _items.add(new Item(_items.length, newItemController.text));
+                                newItemController.text = "";  // clear textbox
+                            });
+                            Navigator.of(context).pop();  // dismiss dialog
+                        },
+                    ),
+                ],
+            );
+        });
+
         String json = Item.listToJson(_items);
         await (await _getItemFile()).writeAsString(json);
     }
 
     Future<File> _getItemFile() async {
         String dir = (await getApplicationDocumentsDirectory()).path;
-        return new File("$dir/counter.txt");
+        return new File("$dir/$FILENAME");
     }
 
     Future<List<Item>> _readItemData() async {
@@ -121,8 +156,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
 
                 var deletion_snackbar = new SnackBar(
-                    content: Text(item.text + " deleted"),
-                    action: SnackBarAction(
+                    content: new Text(item.text + " deleted"),
+                    action: new SnackBarAction(
                         label: 'Undo',
                         onPressed: () {
                             setState(() {
@@ -167,24 +202,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
     @override
     Widget build(BuildContext context) {
-        // This method is rerun every time setState is called, for instance as done
-        // by the _incrementCounter method above.
-        //
-        // The Flutter framework has been optimized to make rerunning build methods
-        // fast, so that you can just rebuild anything that needs updating rather
-        // than having to individually change instances of widgets.
         return new Scaffold(
             appBar: new AppBar(
-                // Here we take the value from the MyHomePage object that was created by
-                // the App.build method, and use it to set our appbar title.
                 title: new Text(widget.title),
             ),
             body: _buildItems(),
             floatingActionButton: new FloatingActionButton(
-                onPressed: _addItem,
+                onPressed: () { _addItem(context); },
                 tooltip: 'Add item',
                 child: new Icon(Icons.add),
-            ), // This trailing comma makes auto-formatting nicer for build methods.
+            ),
         );
     }
 
@@ -208,9 +235,18 @@ class ItemView extends StatefulWidget {
 class ItemViewState extends State<ItemView> {
     final Item item;
     bool editing = false;
+    // controller for the item editing view
+    TextEditingController itemEditingController;
+
     ItemViewState(this.item);
 
-    void _toggleDone(bool value) {
+    @override
+    void initState() {
+        super.initState();
+        itemEditingController = new TextEditingController(text: item.text);
+    }
+
+    void _setDone(bool value) {
         setState(() {
             item.done = value;
         });
@@ -242,33 +278,38 @@ class ItemViewState extends State<ItemView> {
 
     @override
     Widget build(BuildContext context) {
-        Widget tile = (item.text == "") || editing 
+        // delete empty items
+        if (item.text == "") _delete();
+
+        Widget tile = editing
           ? new ListTile(
                 title: new TextField(
-                    controller: new TextEditingController(text: item.text),
+                    controller: itemEditingController,
                     autofocus: true,
                     onSubmitted: _setText,
                 ),
-                // trailing: new IconButton(
-                //     icon: new Icon(Icons.delete),
-                //     tooltip: 'Delete',
-                //     onPressed: _delete,
-                // ),
+                trailing: new IconButton(
+                    icon: new Icon(Icons.done),
+                    tooltip: 'Done',
+                    onPressed: () {
+                        _setText(itemEditingController.text);
+                    },
+                ),
             )
           : new ListTile(
                 title: new Text(item.text),
                 leading: new Checkbox(
                     value: item.done,
-                    onChanged: _toggleDone,
+                    onChanged: _setDone,
                 ),
                 onTap: () {
-                    _toggleDone(!item.done);
+                    _setDone(!item.done);
                 },
                 onLongPress: () {
                     setState(() {
                         editing = true;
                     });
-                }
+                },
             );
         editing = false;
         return tile;

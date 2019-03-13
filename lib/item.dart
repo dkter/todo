@@ -16,16 +16,23 @@ import 'dart:convert';
 class Item {
     int id;
     String text;
+    DateTime due;
     bool done = false;
 
-    Item(this.id, this.text);
+    Item(this.id, this.text, this.due);
 
     static List<Item> listFromJson(String json_obj) {
         List<Item> items = <Item>[];
         List parsedList = json.decode(json_obj);
         for (var jsonItem in parsedList) {
-            Item item = new Item(items.length, jsonItem["text"]);
+            Item item = new Item(items.length, jsonItem["text"], null);
             item.done = jsonItem["done"];
+
+            String due = jsonItem["due"];
+            if (due != null)
+                item.due = DateTime.parse(jsonItem["due"]);
+            else
+                item.due = null;
             items.add(item);
         }
         return items;
@@ -37,6 +44,7 @@ class Item {
             var mapData = new Map();
             mapData["text"] = item.text;
             mapData["done"] = item.done;
+            mapData["due"] = item.due == null ? null : item.due.toIso8601String();
             listData.add(mapData);
             print(item.id);
         }

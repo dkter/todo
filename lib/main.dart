@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'item.dart';
 import 'leave_behind.dart';
+import 'new_item.dart';
 
 String FILENAME = "todo.txt";
 
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
 
 _MyHomePageState _myHomePageState = new _MyHomePageState();
 
+
 class MyHomePage extends StatefulWidget {
     MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -44,6 +46,7 @@ class MyHomePage extends StatefulWidget {
     @override
     _MyHomePageState createState() => _myHomePageState;
 }
+
 
 class _MyHomePageState extends State<MyHomePage> {
     List<Item> _items = <Item>[];
@@ -88,41 +91,23 @@ class _MyHomePageState extends State<MyHomePage> {
             );
         });
         */
+
+        DateTime due = null;
+
         // "add item" modal (dialog)
-        showDialog(context: context, builder: (BuildContext context) {
-            return new AlertDialog(
-                title: const Text("Add an item"),
-                content: new SingleChildScrollView(
-                    child: new Form(
-                        child: new ListBody(
-                            children: <Widget>[
-                                new TextFormField(
-                                    decoration: new InputDecoration(labelText: "Title"),
-                                    controller: newItemController,
-                                ),
-                            ],
-                        ),
-                    ),
-                ),
-                actions: <Widget>[
-                    new FlatButton(
-                        child: new Text("Cancel"),
-                        onPressed: Navigator.of(context).pop,  // dismiss dialog
-                    ),
-                    new FlatButton(
-                        child: new Text("Ok"),
-                        onPressed: () {
-                            setState(() {
-                                // add item to list
-                                _items.add(new Item(_items.length, newItemController.text));
-                                newItemController.text = "";  // clear textbox
-                            });
-                            Navigator.of(context).pop();  // dismiss dialog
-                        },
-                    ),
-                ],
-            );
+        Future<Item> dialog = showDialog<Item>(
+            context: context,
+            builder: (BuildContext context) => new NewItemDialog(),
+        );
+
+        dialog.then((Item item) {
+            if (item != null)
+                setState(() {
+                    item.id = _items.length;
+                    _items.add(item);
+                });
         });
+        setState((){});
 
         String json = Item.listToJson(_items);
         await (await _getItemFile()).writeAsString(json);
@@ -224,6 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 }
 
+
 class ItemView extends StatefulWidget {
     final Item item;
     const ItemView(this.item);
@@ -231,6 +217,7 @@ class ItemView extends StatefulWidget {
     @override
     ItemViewState createState() => new ItemViewState(item);
 }
+
 
 class ItemViewState extends State<ItemView> {
     final Item item;
@@ -279,7 +266,7 @@ class ItemViewState extends State<ItemView> {
     @override
     Widget build(BuildContext context) {
         // delete empty items
-        if (item.text == "") _delete();
+        //if (item.text == "") _delete();
 
         Widget tile = editing
           ? new ListTile(
@@ -298,6 +285,9 @@ class ItemViewState extends State<ItemView> {
             )
           : new ListTile(
                 title: new Text(item.text),
+                subtitle: item.due == null
+                    ? null
+                    : new Text("Due " + dateFormat.format(item.due)),
                 leading: new Checkbox(
                     value: item.done,
                     onChanged: _setDone,

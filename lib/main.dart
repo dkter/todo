@@ -17,10 +17,13 @@ import 'package:path_provider/path_provider.dart';
 import 'item.dart';
 import 'leave_behind.dart';
 import 'new_item.dart';
+import 'edit_item.dart';
 
 String FILENAME = "todo.txt";
 
+
 void main() => runApp(new MyApp());
+
 
 class MyApp extends StatelessWidget {
     @override
@@ -43,6 +46,7 @@ class MyHomePage extends StatefulWidget {
 
     final String title;
 
+
     @override
     _MyHomePageState createState() => _myHomePageState;
 }
@@ -51,6 +55,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
     List<Item> _items = <Item>[];
     TextEditingController newItemController;
+
 
     @override
     void initState() {
@@ -64,34 +69,15 @@ class _MyHomePageState extends State<MyHomePage> {
         newItemController = new TextEditingController();
     }
 
+
     Map<DismissDirection, double> _dismissThresholds() {
         Map<DismissDirection, double> map = new Map<DismissDirection, double>();
         map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
         return map;
     }
 
-    Future<Null> _addItem(BuildContext context) async {
-        /*
-        // "add item" modal (bottom sheet)
-        showModalBottomSheet(context: context, builder: (BuildContext context) {
-            return new Container(
-                margin: const EdgeInsets.all(16.0),
-                child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                        new Padding(
-                            padding: EdgeInsets.only(bottom: 16.0),
-                            child: new Text(
-                                "Add an item",
-                                style: new TextStyle(fontSize: 24.0)),
-                        ),
-                        new TextField(),
-                    ],
-                )
-            );
-        });
-        */
 
+    Future<Null> _addItem(BuildContext context) async {
         DateTime due = null;
 
         // "add item" modal (dialog)
@@ -113,10 +99,12 @@ class _MyHomePageState extends State<MyHomePage> {
         await (await _getItemFile()).writeAsString(json);
     }
 
+
     Future<File> _getItemFile() async {
         String dir = (await getApplicationDocumentsDirectory()).path;
         return new File("$dir/$FILENAME");
     }
+
 
     Future<List<Item>> _readItemData() async {
         try {
@@ -128,6 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
             return <Item>[];
         }
     }
+
 
     Widget _buildItem(BuildContext context, int index) {
         Item item = _items[index];
@@ -163,12 +152,14 @@ class _MyHomePageState extends State<MyHomePage> {
         );
     }
 
+
     void update() {
         String json = Item.listToJson(_items);
         _getItemFile().then((File file) {
             file.writeAsString(json);
         });
     }
+
 
     void updateLocal() {
         _readItemData().then((List<Item> items) {
@@ -178,12 +169,14 @@ class _MyHomePageState extends State<MyHomePage> {
         });
     }
 
+
     int delete(Item item) {
         // Returns the index of the deleted item, for reinsertion purposes
         int index = _items.indexWhere((i) => i.id == item.id);
         _items.removeAt(index);
         return index;
     }
+
 
     @override
     Widget build(BuildContext context) {
@@ -200,9 +193,9 @@ class _MyHomePageState extends State<MyHomePage> {
         );
     }
 
+
     Widget _buildItems() {
         return new ListView.builder(
-            //padding: const EdgeInsets.all(16.0),
             itemBuilder: _buildItem,
             itemCount: _items.length,
         );
@@ -211,8 +204,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 class ItemView extends StatefulWidget {
-    final Item item;
-    const ItemView(this.item);
+    Item item;
+    ItemView(this.item);
+
 
     @override
     ItemViewState createState() => new ItemViewState(item);
@@ -220,18 +214,20 @@ class ItemView extends StatefulWidget {
 
 
 class ItemViewState extends State<ItemView> {
-    final Item item;
+    Item item;
     bool editing = false;
     // controller for the item editing view
     TextEditingController itemEditingController;
 
     ItemViewState(this.item);
 
+
     @override
     void initState() {
         super.initState();
         itemEditingController = new TextEditingController(text: item.text);
     }
+
 
     void _setDone(bool value) {
         setState(() {
@@ -240,12 +236,14 @@ class ItemViewState extends State<ItemView> {
         _myHomePageState.update();
     }
 
+
     void _setText(String text) {
         setState(() {
             item.text = text;
         });
         _myHomePageState.update();
     }
+
 
     void _delete() {
         setState(() {
@@ -257,17 +255,36 @@ class ItemViewState extends State<ItemView> {
         });
     }
 
+
+    void _showEditSheet() {
+        Future<List> sheet = showModalBottomSheet<List>(
+            context: context, 
+            builder: (BuildContext context) {
+                return new EditItemSheet(item);
+            }
+        );
+
+        sheet.then((List<Object> list) {
+            if (list != null)
+                setState(() {
+                    item = list[0];
+                    editing = list[1];
+                });
+
+            setState((){});
+        });
+    }
+
+
     Map<DismissDirection, double> _dismissThresholds() {
         Map<DismissDirection, double> map = new Map<DismissDirection, double>();
         map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
         return map;
     }
 
+
     @override
     Widget build(BuildContext context) {
-        // delete empty items
-        //if (item.text == "") _delete();
-
         Widget tile = editing
           ? new ListTile(
                 title: new TextField(
@@ -296,23 +313,10 @@ class ItemViewState extends State<ItemView> {
                     _setDone(!item.done);
                 },
                 onLongPress: () {
-                    setState(() {
-                        editing = true;
-                    });
+                    _showEditSheet();
                 },
             );
         editing = false;
         return tile;
-        // return new Dismissible(
-        //     key: new Key(item.id.toString()),
-        //     direction: DismissDirection.horizontal,
-        //     onDismissed: (DismissDirection direction) {
-        //         _delete();
-        //     },
-        //     resizeDuration: null,
-        //     dismissThresholds: _dismissThresholds(),
-        //     background: new LeaveBehindView(),
-        //     child: tile,
-        // );
     }
 }

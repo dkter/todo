@@ -64,8 +64,8 @@ class NewItemState extends State<NewItemDialog> {
                                     ),
                                     onPressed: _showPicker,
                                 ),
-                            ]
-                        )
+                            ],
+                        ),
                     ],
                 ),
             ),

@@ -21,6 +21,7 @@ class Item {
 
     Item(this.id, this.text, this.due);
 
+
     static List<Item> listFromJson(String json_obj) {
         List<Item> items = <Item>[];
         List parsedList = json.decode(json_obj);
@@ -38,6 +39,7 @@ class Item {
         return items;
     }
 
+
     static String listToJson(List<Item> items) {
         List<Map> listData = <Map>[];
         for (var item in items){
@@ -46,7 +48,6 @@ class Item {
             mapData["done"] = item.done;
             mapData["due"] = item.due == null ? null : item.due.toIso8601String();
             listData.add(mapData);
-            print(item.id);
         }
         String jsonData = json.encode(listData);
         print(jsonData);

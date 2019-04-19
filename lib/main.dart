@@ -86,17 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (BuildContext context) => new NewItemDialog(),
         );
 
-        dialog.then((Item item) {
+        dialog.then((Item item) async {
             if (item != null)
                 setState(() {
                     item.id = _items.length;
                     _items.add(item);
                 });
+
+            String json = Item.listToJson(_items);
+            await (await _getItemFile()).writeAsString(json);
         });
         setState((){});
-
-        String json = Item.listToJson(_items);
-        await (await _getItemFile()).writeAsString(json);
     }
 
 
@@ -171,6 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     int delete(Item item) {
+        print("Deleting item: " + item.text);
         // Returns the index of the deleted item, for reinsertion purposes
         int index = _items.indexWhere((i) => i.id == item.id);
         _items.removeAt(index);

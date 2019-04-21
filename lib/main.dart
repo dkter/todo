@@ -18,11 +18,15 @@ import 'item.dart';
 import 'leave_behind.dart';
 import 'new_item.dart';
 import 'edit_item.dart';
+import 'notify.dart';
 
 String FILENAME = "todo.txt";
 
 
-void main() => runApp(new MyApp());
+void main() {
+    Notify.initialize();
+    runApp(new MyApp());
+}
 
 
 class MyApp extends StatelessWidget {

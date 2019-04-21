@@ -11,7 +11,10 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
+import 'notify.dart';
+
 
 class Item {
     int id;
@@ -52,5 +55,20 @@ class Item {
         String jsonData = json.encode(listData);
         print(jsonData);
         return jsonData;
+    }
+
+
+    void setNotification(TimeOfDay time, int daysBefore) async {
+        DateTime notifDate = this.due.subtract(new Duration(days: daysBefore));
+        DateTime notifTime = new DateTime(notifDate.year, notifDate.month, notifDate.day, time.hour, time.minute);
+
+        await Notify.notificationPlugin.schedule(
+            this.id,
+            this.text,
+            "Due " + (daysBefore == 0? "today" :
+                      (daysBefore == 1? "tomorrow" :
+                       "in $daysBefore days")),
+            notifTime,
+            Notify.platformChannelSpecifics);
     }
 }

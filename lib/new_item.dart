@@ -78,8 +78,14 @@ class NewItemState extends State<NewItemDialog> {
                     child: new Text("Ok"),
                     onPressed: itemTextController.text == "" ? null : () {
                         var item = new Item(0, itemTextController.text, due);
+
+                        if (this.due != null)
+                            item.setNotification(
+                                new TimeOfDay(hour: 15, minute: 0),
+                                1);
+                            
                         setState(() {
-                            itemTextController.text = "";  // clear textbox
+                            itemTextController.text = "";  // clear textbox,
                         });
                         Navigator.pop<Item>(context, item);  // dismiss dialog
                     },

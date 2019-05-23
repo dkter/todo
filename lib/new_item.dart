@@ -48,41 +48,9 @@ class NewItemState extends State<NewItemDialog> {
             content: new SingleChildScrollView(
                 child: new ListBody(
                     children: <Widget>[
-                        new TextField(
-                            decoration: new InputDecoration(labelText: "Title"),
-                            controller: itemTextController,
-                            onChanged: (String s){setState((){});},
-                        ),
-                        new Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                                due != null
-                                    ? new FlatButton(
-                                        child: new Text("Due " + dateFormat.format(due)),
-                                        onPressed: _showDatePicker,
-                                      )
-                                    : new Center(),
-                                new FlatButton(
-                                    textColor: Colors.blue,
-                                    child: new Text(
-                                        due == null? "Add due date" : "Change",
-                                    ),
-                                    onPressed: _showDatePicker,
-                                ),
-                            ],
-                        ),
-                        (due != null
-                            ? (this.reminderSet
-                                ? this.reminderSettings(context)
-                                : new FlatButton(
-                                    textColor: Colors.blue,
-                                    child: new Text("Add reminder"),
-                                    onPressed: (){setState((){this.reminderSet = true;});},
-                                  )
-                              )
-                            : new Center()
-                        )
+                        this.titleField(context),
+                        this.dueDateField(context),
+                        this.reminderField(context),
                     ],
                 ),
             ),
@@ -93,20 +61,7 @@ class NewItemState extends State<NewItemDialog> {
                 ),
                 new FlatButton(
                     child: new Text("Ok"),
-                    onPressed: itemTextController.text == "" ? null : () {
-                        var item = new Item(0, itemTextController.text, due);
-
-                        if (this.reminderTime != null) {
-                            item.setNotification(
-                                this.reminderTime,
-                                this.reminderDaysBefore);
-                        }
-
-                        setState(() {
-                            itemTextController.text = "";  // clear textbox,
-                        });
-                        Navigator.pop<Item>(context, item);  // dismiss dialog
-                    },
+                    onPressed: ok(context),
                 ),
             ],
         );
@@ -165,6 +120,57 @@ class NewItemState extends State<NewItemDialog> {
     }
 
 
+    Widget titleField(BuildContext context) {
+        return new TextField(
+            decoration: new InputDecoration(labelText: "Title"),
+            controller: itemTextController,
+            onChanged: (String s){setState((){});},
+        );
+    }
+
+
+    Widget dueDateField(BuildContext context) {
+        if (due == null)
+            return new FlatButton(
+                textColor: Colors.blue,
+                child: new Text("Add due date"),
+                onPressed: _showDatePicker,
+            );
+        else
+            return new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                    new FlatButton(
+                        child: new Text("Due " + dateFormat.format(due)),
+                        onPressed: _showDatePicker,
+                    ),
+                    new FlatButton(
+                        textColor: Colors.blue,
+                        child: new Text("Change"),
+                        onPressed: _showDatePicker,
+                    ),
+                ],
+            );
+    }
+
+
+    Widget reminderField(BuildContext context) {
+        if (due != null) {
+            if (this.reminderSet)
+                return this.reminderSettings(context);
+            else
+                return new FlatButton(
+                    textColor: Colors.blue,
+                    child: new Text("Add reminder"),
+                    onPressed: (){ setState((){ this.reminderSet = true; }); },
+                );
+        }
+        else
+            return new Center();
+    }
+
+
     void _showDatePicker() {
         DateTime now = DateTime.now();
         Future<DateTime> picker = showDatePicker(
@@ -188,5 +194,24 @@ class NewItemState extends State<NewItemDialog> {
                 reminderTime = time ?? reminderTime;
             });
         });
+    }
+
+    Function ok(BuildContext context) {
+        return () {
+            if (itemTextController.text != "") {
+                var item = new Item(0, itemTextController.text, due);
+
+                if (this.reminderTime != null) {
+                    item.setNotification(
+                        this.reminderTime,
+                        this.reminderDaysBefore);
+                }
+
+                setState(() {
+                    itemTextController.text = "";  // clear textbox,
+                });
+                Navigator.pop<Item>(context, item);  // dismiss dialog
+            };
+        };
     }
 }

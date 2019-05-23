@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
     }
 }
 
+
 _MyHomePageState _myHomePageState = new _MyHomePageState();
 
 
@@ -290,8 +291,9 @@ class ItemViewState extends State<ItemView> {
 
     @override
     Widget build(BuildContext context) {
-        Widget tile = editing
-          ? new ListTile(
+        Widget tile;
+        if (editing)
+            tile = new ListTile(
                 title: new TextField(
                     controller: itemEditingController,
                     autofocus: true,
@@ -304,12 +306,16 @@ class ItemViewState extends State<ItemView> {
                         _setText(itemEditingController.text);
                     },
                 ),
-            )
-          : new ListTile(
+            );
+        else {
+            Widget subtitle = null;
+            if (item.due != null) {
+                subtitle = new Text("Due " + dateFormat.format(item.due));
+            }
+
+            tile = new ListTile(
                 title: new Text(item.text),
-                subtitle: item.due == null
-                    ? null
-                    : new Text("Due " + dateFormat.format(item.due)),
+                subtitle: subtitle,
                 leading: new Checkbox(
                     value: item.done,
                     onChanged: _setDone,
@@ -321,6 +327,7 @@ class ItemViewState extends State<ItemView> {
                     _showEditSheet();
                 },
             );
+        }
         editing = false;
         return tile;
     }

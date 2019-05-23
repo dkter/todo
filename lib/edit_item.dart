@@ -38,40 +38,50 @@ class EditItemState extends State<EditItemSheet> {
                 child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                        new Row(
-                            children: <Widget>[
-                                new Text(
-                                    item.text,
-                                    style: new TextStyle(fontSize: 24.0)),
-                                new FlatButton(
-                                    textColor: Colors.blue,
-                                    child: new Text("Edit"),
-                                    onPressed: () {
-                                        Navigator.pop(context, [item, true]);
-                                    },
-                                ),
-                            ],
-                        ),
-                        new Row(
-                            children: <Widget>[
-                                item.due != null
-                                    ? new Text("Due " + dateFormat.format(item.due))
-                                    : new Center(),
-                                new FlatButton(
-                                    textColor: Colors.blue,
-                                    child: new Text(
-                                        item.due == null? "Add due date" : "Change",
-                                    ),
-                                    onPressed: _showPicker,
-                                ),
-                            ],
-                        ),
+                        this.titleField(context),
+                        this.dueDateField(context),
                     ],
                 ),
             ),
             onClosing: () {
                 Navigator.pop(context, [item, false]);
             },
+        );
+    }
+
+
+    Widget titleField(BuildContext context) {
+        return new Row(
+            children: <Widget>[
+                new Text(
+                    item.text,
+                    style: new TextStyle(fontSize: 24.0)),
+                new FlatButton(
+                    textColor: Colors.blue,
+                    child: new Text("Edit"),
+                    onPressed: () {
+                        Navigator.pop(context, [item, true]);
+                    },
+                ),
+            ],
+        );
+    }
+
+
+    Widget dueDateField(BuildContext context) {
+        return new Row(
+            children: <Widget>[
+                item.due != null
+                    ? new Text("Due " + dateFormat.format(item.due))
+                    : new Center(),
+                new FlatButton(
+                    textColor: Colors.blue,
+                    child: new Text(
+                        item.due == null? "Add due date" : "Change",
+                    ),
+                    onPressed: _showPicker,
+                ),
+            ],
         );
     }
 

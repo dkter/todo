@@ -86,6 +86,7 @@ class EditItemState extends State<EditItemSheet> {
         picker.then((DateTime date) {
             setState(() {
                 item.due = date;
+                item.updateNotification();
             });
         });
     }

@@ -25,13 +25,19 @@ class NewItemDialog extends StatefulWidget {
 class NewItemState extends State<NewItemDialog> {
     TextEditingController itemTextController;
     DateTime due;
+    bool reminderSet;
+    TimeOfDay reminderTime;
+    int reminderDaysBefore;
 
 
     @override
     void initState() {
         super.initState();
-        itemTextController = new TextEditingController();
-        due = null;
+        this.itemTextController = new TextEditingController();
+        this.due = null;
+        this.reminderSet = false;
+        this.reminderTime = new TimeOfDay(hour:15, minute:0);
+        this.reminderDaysBefore = 1;
     }
 
 
@@ -54,7 +60,7 @@ class NewItemState extends State<NewItemDialog> {
                                 due != null
                                     ? new FlatButton(
                                         child: new Text("Due " + dateFormat.format(due)),
-                                        onPressed: _showPicker,
+                                        onPressed: _showDatePicker,
                                       )
                                     : new Center(),
                                 new FlatButton(
@@ -62,10 +68,21 @@ class NewItemState extends State<NewItemDialog> {
                                     child: new Text(
                                         due == null? "Add due date" : "Change",
                                     ),
-                                    onPressed: _showPicker,
+                                    onPressed: _showDatePicker,
                                 ),
                             ],
                         ),
+                        (due != null
+                            ? (this.reminderSet
+                                ? this.reminderSettings(context)
+                                : new FlatButton(
+                                    textColor: Colors.blue,
+                                    child: new Text("Add reminder"),
+                                    onPressed: (){setState((){this.reminderSet = true;});},
+                                  )
+                              )
+                            : new Center()
+                        )
                     ],
                 ),
             ),
@@ -79,11 +96,12 @@ class NewItemState extends State<NewItemDialog> {
                     onPressed: itemTextController.text == "" ? null : () {
                         var item = new Item(0, itemTextController.text, due);
 
-                        if (this.due != null)
+                        if (this.reminderTime != null) {
                             item.setNotification(
-                                new TimeOfDay(hour: 15, minute: 0),
-                                1);
-                            
+                                this.reminderTime,
+                                this.reminderDaysBefore);
+                        }
+
                         setState(() {
                             itemTextController.text = "";  // clear textbox,
                         });
@@ -95,7 +113,59 @@ class NewItemState extends State<NewItemDialog> {
     }
 
 
-    void _showPicker() {
+    Widget reminderSettings(BuildContext context) {
+        return new Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+                new Text("Reminder"),
+                // Set number of days before
+                new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                        new FlatButton(
+                            child: new Text(reminderDaysBefore == 1? "1 day before due date" : "$reminderDaysBefore days before due date"),
+                            onPressed: _showTimePicker,
+                        ),
+                        /*new FlatButton(
+                            textColor: Colors.blue,
+                            child: new Text("Change"),
+                            onPressed: _showTimePicker,
+                        ),*/
+                    ],
+                ),
+                new Slider(
+                    value: this.reminderDaysBefore * 1.0,
+                    min: 0,
+                    max: 10,
+                    divisions: 10,
+                    onChanged: (double value) {
+                        setState((){
+                            this.reminderDaysBefore = value.round();
+                        });
+                    }
+                ),
+                // Set time
+                new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                        new FlatButton(
+                            child: new Text("Time: ${reminderTime.hour}:${reminderTime.minute.toString().padLeft(2, '0')}"),
+                            onPressed: _showTimePicker,
+                        ),
+                        new FlatButton(
+                            textColor: Colors.blue,
+                            child: new Text("Change"),
+                            onPressed: _showTimePicker,
+                        ),
+                    ],
+                ),
+            ],
+        );
+    }
+
+
+    void _showDatePicker() {
         DateTime now = DateTime.now();
         Future<DateTime> picker = showDatePicker(
             context: context,
@@ -105,6 +175,17 @@ class NewItemState extends State<NewItemDialog> {
         picker.then((DateTime date) {
             setState(() {
                 due = date;
+            });
+        });
+    }
+
+    void _showTimePicker() {
+        Future<TimeOfDay> picker = showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.now());
+        picker.then((TimeOfDay time) {
+            setState(() {
+                reminderTime = time ?? reminderTime;
             });
         });
     }

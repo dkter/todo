@@ -21,6 +21,8 @@ class Item {
     String text;
     DateTime due;
     bool done = false;
+    TimeOfDay notifTimeOfDay;
+    int notifDaysBefore;
 
     Item(this.id, this.text, this.due);
 
@@ -58,17 +60,51 @@ class Item {
     }
 
 
-    void setNotification(TimeOfDay time, int daysBefore) async {
-        DateTime notifDate = this.due.subtract(new Duration(days: daysBefore));
-        DateTime notifTime = new DateTime(notifDate.year, notifDate.month, notifDate.day, time.hour, time.minute);
+    void setNotification(TimeOfDay notifTimeOfDay, int notifDaysBefore) async {
+        this.notifTimeOfDay = notifTimeOfDay;
+        this.notifDaysBefore = notifDaysBefore;
+
+        DateTime notifDate = this.due.subtract(new Duration(days: notifDaysBefore));
+        DateTime notifTime = new DateTime(notifDate.year,
+                                          notifDate.month,
+                                          notifDate.day,
+                                          notifTimeOfDay.hour,
+                                          notifTimeOfDay.minute);
+        print("Setting reminder for $notifTime");
 
         await Notify.notificationPlugin.schedule(
             this.id,
             this.text,
-            "Due " + (daysBefore == 0? "today" :
-                      (daysBefore == 1? "tomorrow" :
-                       "in $daysBefore days")),
+            "Due " + (notifDaysBefore == 0? "today" :
+                      (notifDaysBefore == 1? "tomorrow" :
+                       "in $notifDaysBefore days")),
             notifTime,
             Notify.platformChannelSpecifics);
+    }
+
+    void updateNotification() async {
+        // cancel old notification
+        this.deleteNotification();
+
+        DateTime notifDate = this.due.subtract(new Duration(days: this.notifDaysBefore));
+        DateTime notifTime = new DateTime(notifDate.year,
+                                          notifDate.month,
+                                          notifDate.day,
+                                          this.notifTimeOfDay.hour,
+                                          this.notifTimeOfDay.minute);
+        print("Setting reminder for $notifTime");
+
+        await Notify.notificationPlugin.schedule(
+            this.id,
+            this.text,
+            "Due " + (this.notifDaysBefore == 0? "today" :
+                      (this.notifDaysBefore == 1? "tomorrow" :
+                       "in ${this.notifDaysBefore} days")),
+            notifTime,
+            Notify.platformChannelSpecifics);
+    }
+
+    void deleteNotification() async {
+        await Notify.notificationPlugin.cancel(this.id);   
     }
 }

@@ -75,46 +75,9 @@ class NewItemState extends State<NewItemDialog> {
             children: <Widget>[
                 new Text("Reminder"),
                 // Set number of days before
-                new Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                        new FlatButton(
-                            child: new Text(reminderDaysBefore == 1? "1 day before due date" : "$reminderDaysBefore days before due date"),
-                            onPressed: _showTimePicker,
-                        ),
-                        /*new FlatButton(
-                            textColor: Colors.blue,
-                            child: new Text("Change"),
-                            onPressed: _showTimePicker,
-                        ),*/
-                    ],
-                ),
-                new Slider(
-                    value: this.reminderDaysBefore * 1.0,
-                    min: 0,
-                    max: 10,
-                    divisions: 10,
-                    onChanged: (double value) {
-                        setState((){
-                            this.reminderDaysBefore = value.round();
-                        });
-                    }
-                ),
+                reminderDaysBeforeField(context),
                 // Set time
-                new Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                        new FlatButton(
-                            child: new Text("Time: ${reminderTime.hour}:${reminderTime.minute.toString().padLeft(2, '0')}"),
-                            onPressed: _showTimePicker,
-                        ),
-                        new FlatButton(
-                            textColor: Colors.blue,
-                            child: new Text("Change"),
-                            onPressed: _showTimePicker,
-                        ),
-                    ],
-                ),
+                reminderTimeField(context),
             ],
         );
     }
@@ -168,6 +131,54 @@ class NewItemState extends State<NewItemDialog> {
         }
         else
             return new Center();
+    }
+
+
+    Widget reminderDaysBeforeField(BuildContext context) {
+        return new Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+                new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                        new FlatButton(
+                            child: new Text(reminderDaysBefore == 1? "1 day before due date" : "$reminderDaysBefore days before due date"),
+                            onPressed: _showTimePicker,
+                        ),
+                    ],
+                ),
+                new Slider(
+                    value: this.reminderDaysBefore * 1.0,
+                    min: 0,
+                    max: 10,
+                    divisions: 10,
+                    onChanged: (double value) {
+                        setState((){
+                            this.reminderDaysBefore = value.round();
+                        });
+                    }
+                ),
+            ],
+        );
+    }
+
+
+    Widget reminderTimeField(BuildContext context) {
+        return new Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+                new FlatButton(
+                    child: new Text("Time: ${reminderTime.hour}:${reminderTime.minute.toString().padLeft(2, '0')}"),
+                    onPressed: _showTimePicker,
+                ),
+                new FlatButton(
+                    textColor: Colors.blue,
+                    child: new Text("Change"),
+                    onPressed: _showTimePicker,
+                ),
+            ],
+        );
     }
 
 

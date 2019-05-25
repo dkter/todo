@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
 import 'notify.dart';
+import 'util.dart';
 
 
 class Item {
@@ -36,9 +37,18 @@ class Item {
 
             String due = jsonItem["due"];
             if (due != null)
-                item.due = DateTime.parse(jsonItem["due"]);
+                item.due = DateTime.parse(due);
             else
                 item.due = null;
+
+            String notifTimeOfDay = jsonItem["notifTimeOfDay"];
+            if (notifTimeOfDay != null)
+                item.notifTimeOfDay = deserializeTimeOfDay(notifTimeOfDay);
+            else
+                item.notifTimeOfDay = null;
+
+            item.notifDaysBefore = jsonItem["notifDaysBefore"];
+
             items.add(item);
         }
         return items;
@@ -51,7 +61,9 @@ class Item {
             var mapData = new Map();
             mapData["text"] = item.text;
             mapData["done"] = item.done;
-            mapData["due"] = item.due == null ? null : item.due.toIso8601String();
+            mapData["due"] = item.due?.toIso8601String();
+            mapData["notifTimeOfDay"] = serializeTimeOfDay(item.notifTimeOfDay);
+            mapData["notifDaysBefore"] = item.notifDaysBefore;
             listData.add(mapData);
         }
         String jsonData = json.encode(listData);

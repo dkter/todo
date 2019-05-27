@@ -265,18 +265,17 @@ class ItemViewState extends State<ItemView> {
 
 
     void _showEditSheet() {
-        Future<List> sheet = showModalBottomSheet<List>(
+        Future<bool> sheet = showModalBottomSheet<bool>(
             context: context, 
             builder: (BuildContext context) {
                 return new EditItemSheet(item);
             }
         );
 
-        sheet.then((List<Object> list) {
-            if (list != null)
+        sheet.then((bool editing) {
+            if (editing != null)
                 setState(() {
-                    item = list[0];
-                    editing = list[1];
+                    this.editing = editing;
                 });
 
             setState((){});

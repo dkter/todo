@@ -51,7 +51,7 @@ class EditItemState extends State<EditItemSheet> {
                 ),
             ),
             onClosing: () {
-                Navigator.pop(context, [item, false]);
+                Navigator.pop(context, false);
             },
         );
     }
@@ -67,7 +67,7 @@ class EditItemState extends State<EditItemSheet> {
                     textColor: Colors.blue,
                     child: new Text("Edit"),
                     onPressed: () {
-                        Navigator.pop(context, [item, true]);
+                        Navigator.pop(context, true);
                     },
                 ),
             ],
@@ -132,12 +132,12 @@ class EditItemState extends State<EditItemSheet> {
 
     void _showEditReminder() {
         // "add item" modal (dialog)
-        Future<Item> dialog = showDialog<Item>(
+        Future dialog = showDialog(
             context: context,
             builder: (BuildContext context) => new EditReminderDialog(this.item),
         );
 
-        dialog.then((Item item) async {
+        dialog.then((dynamic) async {
             setState((){});
         });
     }

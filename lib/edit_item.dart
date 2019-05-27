@@ -38,21 +38,16 @@ class EditItemState extends State<EditItemSheet> {
 
     @override
     Widget build(BuildContext context) {
-        return new BottomSheet(
-            builder: (BuildContext context) => new Container(
-                margin: const EdgeInsets.all(16.0),
-                child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                        this.titleField(context),
-                        this.dueDateField(context),
-                        this.reminderField(context),
-                    ],
-                ),
+        return new Container(
+            margin: const EdgeInsets.all(16.0),
+            child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                    this.titleField(context),
+                    this.dueDateField(context),
+                    this.reminderField(context),
+                ],
             ),
-            onClosing: () {
-                Navigator.pop(context, false);
-            },
         );
     }
 

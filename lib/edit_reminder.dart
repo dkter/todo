@@ -53,20 +53,17 @@ class EditReminderState extends State<EditReminderDialog> {
             content: reminderSettings(context),
             actions: <Widget>[
                 new FlatButton(
+                    textColor: Colors.red,
+                    child: new Text("Delete"),
+                    onPressed: _delete(context),
+                ),
+                new FlatButton(
                     child: new Text("Cancel"),
                     onPressed: Navigator.of(context).pop,  // dismiss dialog
                 ),
                 new FlatButton(
                     child: new Text("Ok"),
-                    onPressed: () {
-                        if (this.reminderTime != null) {
-                            item.updateNotification(
-                                this.reminderTime,
-                                this.reminderDaysBefore);
-                        }
-
-                        Navigator.pop(context);  // dismiss dialog
-                    },
+                    onPressed: _ok(context),
                 ),
             ],
         );
@@ -86,7 +83,8 @@ class EditReminderState extends State<EditReminderDialog> {
             ],
         );
     }
-    
+
+
     Widget reminderDaysBeforeField(BuildContext context) {
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -134,6 +132,7 @@ class EditReminderState extends State<EditReminderDialog> {
         );
     }
 
+
     void _showTimePicker() {
         Future<TimeOfDay> picker = showTimePicker(
             context: context,
@@ -143,5 +142,29 @@ class EditReminderState extends State<EditReminderDialog> {
                 reminderTime = time ?? reminderTime;
             });
         });
+    }
+
+
+    Function _delete(BuildContext context) {
+        return () {
+            if (this.reminderTime != null) {
+                item.deleteNotification();
+            }
+
+            Navigator.pop(context);  // dismiss dialog
+        };
+    }
+
+
+    Function _ok(BuildContext context) {
+        return () {
+            if (this.reminderTime != null) {
+                item.updateNotification(
+                    this.reminderTime,
+                    this.reminderDaysBefore);
+            }
+
+            Navigator.pop(context);  // dismiss dialog
+        };
     }
 }

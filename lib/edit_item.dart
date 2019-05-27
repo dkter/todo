@@ -58,6 +58,7 @@ class EditItemState extends State<EditItemSheet> {
         return new ListTile(
             leading: new Icon(Icons.edit),
             title: new Text("Edit title"),
+            subtitle: new Text(item.text),
             onTap: () {
                 Navigator.pop(context, true);
             },
@@ -76,6 +77,7 @@ class EditItemState extends State<EditItemSheet> {
             return new ListTile(
                 leading: new Icon(Icons.event),
                 title: new Text("Edit due date"),
+                subtitle: new Text(dateFormat.format(item.due)),
                 onTap: _showDatePicker,
             );
     }
@@ -93,6 +95,7 @@ class EditItemState extends State<EditItemSheet> {
                 return new ListTile(
                     leading: new Icon(Icons.alarm),
                     title: new Text("Edit reminder"),
+                    subtitle: new Text("${item.notifDaysBefore} days before at ${item.notifTimeOfDay.format(context)}"),
                     onTap: _showEditReminder,
                 );
         else

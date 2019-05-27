@@ -15,6 +15,7 @@ import 'item.dart';
 import 'new_item.dart';
 import 'edit_reminder.dart';
 import 'util.dart';
+import 'custom_icons_icons.dart';
 
 
 class EditItemSheet extends StatefulWidget {
@@ -65,13 +66,18 @@ class EditItemState extends State<EditItemSheet> {
 
 
     Widget dueDateField(BuildContext context) {
-        return new ListTile(
-            leading: new Icon(Icons.calendar_today),
-            title: item.due != null
-                ? new Text("Edit due date")
-                : new Text("Add due date"),
-            onTap: _showDatePicker,
-        );
+        if (item.due == null)
+            return new ListTile(
+                leading: new Icon(CustomIcons.calendar_add),
+                title: new Text("Add due date"),
+                onTap: _showDatePicker,
+            );
+        else
+            return new ListTile(
+                leading: new Icon(Icons.event),
+                title: new Text("Edit due date"),
+                onTap: _showDatePicker,
+            );
     }
 
 

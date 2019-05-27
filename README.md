@@ -7,7 +7,7 @@ Simple to-do list app for Android.
 - Edit items by long-pressing on them
 - Delete items by swiping them away
 - Set a due date to keep track of your tasks
-- (beta) Schedule a reminder notification to help remind you what's coming up
+- Schedule a reminder notification to help remind you what's coming up
 - Since this is made with Flutter, it may support iOS too, but I don't have an iPhone so I can't check
 
 ## Screenshot

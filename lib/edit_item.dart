@@ -39,9 +39,10 @@ class EditItemState extends State<EditItemSheet> {
     @override
     Widget build(BuildContext context) {
         return new Container(
-            margin: const EdgeInsets.all(16.0),
+            margin: const EdgeInsets.all(8.0),
             child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                //crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                     this.titleField(context),
                     this.dueDateField(context),
@@ -53,59 +54,43 @@ class EditItemState extends State<EditItemSheet> {
 
 
     Widget titleField(BuildContext context) {
-        return new Row(
-            children: <Widget>[
-                new Text(
-                    item.text,
-                    style: new TextStyle(fontSize: 24.0)),
-                new FlatButton(
-                    textColor: Colors.blue,
-                    child: new Text("Edit"),
-                    onPressed: () {
-                        Navigator.pop(context, true);
-                    },
-                ),
-            ],
+        return new ListTile(
+            leading: new Icon(Icons.edit),
+            title: new Text("Edit title"),
+            onTap: () {
+                Navigator.pop(context, true);
+            },
         );
     }
 
 
     Widget dueDateField(BuildContext context) {
-        return new Row(
-            children: <Widget>[
-                item.due != null
-                    ? new Text("Due " + dateFormat.format(item.due))
-                    : new Center(),
-                new FlatButton(
-                    textColor: Colors.blue,
-                    child: new Text(
-                        item.due == null? "Add due date" : "Change",
-                    ),
-                    onPressed: _showDatePicker,
-                ),
-            ],
+        return new ListTile(
+            leading: new Icon(Icons.calendar_today),
+            title: item.due != null
+                ? new Text("Edit due date")
+                : new Text("Add due date"),
+            onTap: _showDatePicker,
         );
     }
 
 
     Widget reminderField(BuildContext context) {
-        if (item.reminderSet)
-            return new Row(
-                children: <Widget>[
-                    new Text("Reminder set for ${item.notifDaysBefore} day${item.notifDaysBefore == 1? '' : 's'} before at ${item.notifTimeOfDay.format(context)}"),
-                    new FlatButton(
-                        textColor: Colors.blue,
-                        child: new Text("Edit"),
-                        onPressed: _showEditReminder,
-                    ),
-                ],
-            );
+        if (item.due != null)
+            if (!item.reminderSet)
+                return new ListTile(
+                    leading: new Icon(Icons.alarm_add),
+                    title: new Text("Add reminder"),
+                    onTap: _showEditReminder,
+                );
+            else
+                return new ListTile(
+                    leading: new Icon(Icons.alarm),
+                    title: new Text("Edit reminder"),
+                    onTap: _showEditReminder,
+                );
         else
-            return new FlatButton(
-                textColor: Colors.blue,
-                child: new Text("Add reminder"),
-                onPressed: _showEditReminder,
-            );
+            return new Center();
     }
 
 

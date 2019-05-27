@@ -13,6 +13,8 @@
 import 'package:flutter/material.dart';
 import 'item.dart';
 import 'new_item.dart';
+import 'edit_reminder.dart';
+import 'util.dart';
 
 
 class EditItemSheet extends StatefulWidget {
@@ -29,6 +31,10 @@ class EditItemState extends State<EditItemSheet> {
     final Item item;
     EditItemState(this.item);
 
+    bool reminderSet = false;
+    TimeOfDay reminderTime;
+    int reminderDaysBefore;
+
 
     @override
     Widget build(BuildContext context) {
@@ -40,6 +46,7 @@ class EditItemState extends State<EditItemSheet> {
                     children: <Widget>[
                         this.titleField(context),
                         this.dueDateField(context),
+                        this.reminderField(context),
                     ],
                 ),
             ),
@@ -79,14 +86,35 @@ class EditItemState extends State<EditItemSheet> {
                     child: new Text(
                         item.due == null? "Add due date" : "Change",
                     ),
-                    onPressed: _showPicker,
+                    onPressed: _showDatePicker,
                 ),
             ],
         );
     }
 
 
-    void _showPicker() {
+    Widget reminderField(BuildContext context) {
+        if (item.reminderSet)
+            return new Row(
+                children: <Widget>[
+                    new Text("Reminder set for ${item.notifDaysBefore} day${item.notifDaysBefore == 1? '' : 's'} before at ${item.notifTimeOfDay.format(context)}"),
+                    new FlatButton(
+                        textColor: Colors.blue,
+                        child: new Text("Edit"),
+                        onPressed: _showEditReminder,
+                    ),
+                ],
+            );
+        else
+            return new FlatButton(
+                textColor: Colors.blue,
+                child: new Text("Add reminder"),
+                onPressed: _showEditReminder,
+            );
+    }
+
+
+    void _showDatePicker() {
         DateTime now = DateTime.now();
         Future<DateTime> picker = showDatePicker(
             context: context,
@@ -96,8 +124,21 @@ class EditItemState extends State<EditItemSheet> {
         picker.then((DateTime date) {
             setState(() {
                 item.due = date;
-                item.updateNotification();
+                if (item.reminderSet)
+                    item.updateNotification();
             });
+        });
+    }
+
+    void _showEditReminder() {
+        // "add item" modal (dialog)
+        Future<Item> dialog = showDialog<Item>(
+            context: context,
+            builder: (BuildContext context) => new EditReminderDialog(this.item),
+        );
+
+        dialog.then((Item item) async {
+            setState((){});
         });
     }
 }

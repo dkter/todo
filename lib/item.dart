@@ -22,6 +22,7 @@ class Item {
     String text;
     DateTime due;
     bool done = false;
+    bool reminderSet = false;
     TimeOfDay notifTimeOfDay;
     int notifDaysBefore;
 
@@ -40,6 +41,8 @@ class Item {
                 item.due = DateTime.parse(due);
             else
                 item.due = null;
+
+            item.reminderSet = jsonItem["reminderSet"];
 
             String notifTimeOfDay = jsonItem["notifTimeOfDay"];
             if (notifTimeOfDay != null)
@@ -62,6 +65,7 @@ class Item {
             mapData["text"] = item.text;
             mapData["done"] = item.done;
             mapData["due"] = item.due?.toIso8601String();
+            mapData["reminderSet"] = item.reminderSet;
             mapData["notifTimeOfDay"] = serializeTimeOfDay(item.notifTimeOfDay);
             mapData["notifDaysBefore"] = item.notifDaysBefore;
             listData.add(mapData);
@@ -73,6 +77,7 @@ class Item {
 
 
     void setNotification(TimeOfDay notifTimeOfDay, int notifDaysBefore) async {
+        this.reminderSet = true;
         this.notifTimeOfDay = notifTimeOfDay;
         this.notifDaysBefore = notifDaysBefore;
 
@@ -94,16 +99,22 @@ class Item {
             Notify.platformChannelSpecifics);
     }
 
-    void updateNotification() async {
+    void updateNotification([TimeOfDay notifTimeOfDay, int notifDaysBefore]) async {
+        notifTimeOfDay ??= this.notifTimeOfDay;
+        notifDaysBefore ??= this.notifDaysBefore;
+        this.notifTimeOfDay = notifTimeOfDay;
+        this.notifDaysBefore = notifDaysBefore;
+
         // cancel old notification
         this.deleteNotification();
+        this.reminderSet = true;
 
-        DateTime notifDate = this.due.subtract(new Duration(days: this.notifDaysBefore));
+        DateTime notifDate = this.due.subtract(new Duration(days: notifDaysBefore));
         DateTime notifTime = new DateTime(notifDate.year,
                                           notifDate.month,
                                           notifDate.day,
-                                          this.notifTimeOfDay.hour,
-                                          this.notifTimeOfDay.minute);
+                                          notifTimeOfDay.hour,
+                                          notifTimeOfDay.minute);
         print("Setting reminder for $notifTime");
 
         await Notify.notificationPlugin.schedule(
@@ -117,6 +128,7 @@ class Item {
     }
 
     void deleteNotification() async {
+        this.reminderSet = false;
         await Notify.notificationPlugin.cancel(this.id);   
     }
 }

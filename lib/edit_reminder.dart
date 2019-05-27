@@ -1,6 +1,6 @@
 /**
  * A simple to-do list app.
- * Copyright (C) David Teresi 2019
+ * Copyright (C) David Teresi 2018
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,15 +15,20 @@ import 'package:intl/intl.dart';
 import 'item.dart';
 import 'util.dart';
 
-class NewItemDialog extends StatefulWidget {
+class EditReminderDialog extends StatefulWidget {
+    final Item item;
+    const EditReminderDialog(this.item);
+
     @override
-    State createState() => new NewItemState();
+    State createState() => new EditReminderState(this.item);
 }
 
 
-class NewItemState extends State<NewItemDialog> {
+class EditReminderState extends State<EditReminderDialog> {
+    final Item item;
+    EditReminderState(this.item);
+
     TextEditingController itemTextController;
-    DateTime due;
     bool reminderSet;
     TimeOfDay reminderTime;
     int reminderDaysBefore;
@@ -33,9 +38,8 @@ class NewItemState extends State<NewItemDialog> {
     void initState() {
         super.initState();
         this.itemTextController = new TextEditingController();
-        this.due = null;
         this.reminderSet = false;
-        this.reminderTime = new TimeOfDay(hour:15, minute:0);
+        this.reminderTime = new TimeOfDay(hour: 15, minute: 0);
         this.reminderDaysBefore = 1;
     }
 
@@ -43,16 +47,10 @@ class NewItemState extends State<NewItemDialog> {
     @override
     Widget build(BuildContext context) {
         return new AlertDialog(
-            title: const Text("Add an item"),
-            content: new SingleChildScrollView(
-                child: new ListBody(
-                    children: <Widget>[
-                        this.titleField(context),
-                        this.dueDateField(context),
-                        this.reminderField(context),
-                    ],
-                ),
+            title: Text(
+                (this.item.reminderSet? "Edit reminder" : "Add reminder"),
             ),
+            content: reminderSettings(context),
             actions: <Widget>[
                 new FlatButton(
                     child: new Text("Cancel"),
@@ -60,7 +58,15 @@ class NewItemState extends State<NewItemDialog> {
                 ),
                 new FlatButton(
                     child: new Text("Ok"),
-                    onPressed: ok(context),
+                    onPressed: () {
+                        if (this.reminderTime != null) {
+                            item.updateNotification(
+                                this.reminderTime,
+                                this.reminderDaysBefore);
+                        }
+
+                        Navigator.pop(context);  // dismiss dialog
+                    },
                 ),
             ],
         );
@@ -80,59 +86,7 @@ class NewItemState extends State<NewItemDialog> {
             ],
         );
     }
-
-
-    Widget titleField(BuildContext context) {
-        return new TextField(
-            decoration: new InputDecoration(labelText: "Title"),
-            controller: itemTextController,
-            onChanged: (String s){setState((){});},
-        );
-    }
-
-
-    Widget dueDateField(BuildContext context) {
-        if (due == null)
-            return new FlatButton(
-                textColor: Colors.blue,
-                child: new Text("Add due date"),
-                onPressed: _showDatePicker,
-            );
-        else
-            return new Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                    new FlatButton(
-                        child: new Text("Due " + dateFormat.format(due)),
-                        onPressed: _showDatePicker,
-                    ),
-                    new FlatButton(
-                        textColor: Colors.blue,
-                        child: new Text("Change"),
-                        onPressed: _showDatePicker,
-                    ),
-                ],
-            );
-    }
-
-
-    Widget reminderField(BuildContext context) {
-        if (due != null) {
-            if (this.reminderSet)
-                return this.reminderSettings(context);
-            else
-                return new FlatButton(
-                    textColor: Colors.blue,
-                    child: new Text("Add reminder"),
-                    onPressed: (){ setState((){ this.reminderSet = true; }); },
-                );
-        }
-        else
-            return new Center();
-    }
-
-
+    
     Widget reminderDaysBeforeField(BuildContext context) {
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -180,21 +134,6 @@ class NewItemState extends State<NewItemDialog> {
         );
     }
 
-
-    void _showDatePicker() {
-        DateTime now = DateTime.now();
-        Future<DateTime> picker = showDatePicker(
-            context: context,
-            initialDate: now,
-            firstDate: now,
-            lastDate: DateTime(2030));
-        picker.then((DateTime date) {
-            setState(() {
-                due = date;
-            });
-        });
-    }
-
     void _showTimePicker() {
         Future<TimeOfDay> picker = showTimePicker(
             context: context,
@@ -204,24 +143,5 @@ class NewItemState extends State<NewItemDialog> {
                 reminderTime = time ?? reminderTime;
             });
         });
-    }
-
-    Function ok(BuildContext context) {
-        return () {
-            if (itemTextController.text != "") {
-                var item = new Item(0, itemTextController.text, due);
-
-                if (this.reminderSet) {
-                    item.setNotification(
-                        this.reminderTime,
-                        this.reminderDaysBefore);
-                }
-
-                setState(() {
-                    itemTextController.text = "";  // clear textbox,
-                });
-                Navigator.pop<Item>(context, item);  // dismiss dialog
-            };
-        };
     }
 }

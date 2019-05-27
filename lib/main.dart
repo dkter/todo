@@ -19,6 +19,7 @@ import 'leave_behind.dart';
 import 'new_item.dart';
 import 'edit_item.dart';
 import 'notify.dart';
+import 'util.dart';
 
 String FILENAME = "todo.txt";
 
@@ -177,6 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int delete(Item item) {
         print("Deleting item: " + item.text);
+        item.deleteNotification();
         // Returns the index of the deleted item, for reinsertion purposes
         int index = _items.indexWhere((i) => i.id == item.id);
         _items.removeAt(index);

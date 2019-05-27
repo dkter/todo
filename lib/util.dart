@@ -1,6 +1,10 @@
 import "package:flutter/material.dart";
+import "package:intl/intl.dart";
+
+var dateFormat = new DateFormat.yMMMd();
 
 String serializeTimeOfDay(TimeOfDay tod) {
+    if (tod == null) return null;
     return "${tod.hour}:${tod.minute.toString().padLeft(2, '0')}";
 }
 

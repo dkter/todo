@@ -76,51 +76,54 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
 
-    Map<DismissDirection, double> _dismissThresholds() {
-        Map<DismissDirection, double> map = new Map<DismissDirection, double>();
-        map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
-        return map;
-    }
-
-
-    Future<Null> _addItem(BuildContext context) async {
-        DateTime due = null;
-
-        // "add item" modal (dialog)
-        Future<Item> dialog = showDialog<Item>(
-            context: context,
-            builder: (BuildContext context) => new NewItemDialog(),
+    @override
+    Widget build(BuildContext context) {
+        return new Scaffold(
+            appBar: new AppBar(
+                title: new Text(widget.title),
+            ),
+            body: _buildItems(),
+            floatingActionButton: new FloatingActionButton(
+                onPressed: () { _addItem(context); },
+                tooltip: 'Add item',
+                child: new Icon(Icons.add),
+            ),
         );
+    }
 
-        dialog.then((Item item) async {
-            if (item != null)
-                setState(() {
-                    item.id = _items.length;
-                    _items.add(item);
-                });
 
-            String json = Item.listToJson(_items);
-            await (await _getItemFile()).writeAsString(json);
+    int delete(Item item) {
+        print("Deleting item: " + item.text);
+        item.deleteReminder();
+        // Returns the index of the deleted item, for reinsertion purposes
+        int index = _items.indexWhere((i) => i.id == item.id);
+        _items.removeAt(index);
+        return index;
+    }
+
+
+    void update() {
+        String json = Item.listToJson(_items);
+        _getItemFile().then((File file) {
+            file.writeAsString(json);
         });
-        setState((){});
     }
 
 
-    Future<File> _getItemFile() async {
-        String dir = (await getApplicationDocumentsDirectory()).path;
-        return new File("$dir/$FILENAME");
+    void updateLocal() {
+        _readItemData().then((List<Item> items) {
+            setState(() {
+                _items = items;
+            });
+        });
     }
 
 
-    Future<List<Item>> _readItemData() async {
-        try {
-            File file = await _getItemFile();
-            String json = await file.readAsString();
-            List<Item> items = Item.listFromJson(json);
-            return items;
-        } on FileSystemException {
-            return <Item>[];
-        }
+    Widget _buildItems() {
+        return new ListView.builder(
+            itemBuilder: _buildItem,
+            itemCount: _items.length,
+        );
     }
 
 
@@ -153,60 +156,58 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             resizeDuration: null,
             dismissThresholds: _dismissThresholds(),
-            background: new LeaveBehindView(),
+            background: new LeaveBehindRightView(),
+            secondaryBackground: new LeaveBehindLeftView(),
             child: new ItemView(item),
         );
     }
 
 
-    void update() {
-        String json = Item.listToJson(_items);
-        _getItemFile().then((File file) {
-            file.writeAsString(json);
-        });
-    }
+    Future<Null> _addItem(BuildContext context) async {
+        DateTime due = null;
 
-
-    void updateLocal() {
-        _readItemData().then((List<Item> items) {
-            setState(() {
-                _items = items;
-            });
-        });
-    }
-
-
-    int delete(Item item) {
-        print("Deleting item: " + item.text);
-        item.deleteReminder();
-        // Returns the index of the deleted item, for reinsertion purposes
-        int index = _items.indexWhere((i) => i.id == item.id);
-        _items.removeAt(index);
-        return index;
-    }
-
-
-    @override
-    Widget build(BuildContext context) {
-        return new Scaffold(
-            appBar: new AppBar(
-                title: new Text(widget.title),
-            ),
-            body: _buildItems(),
-            floatingActionButton: new FloatingActionButton(
-                onPressed: () { _addItem(context); },
-                tooltip: 'Add item',
-                child: new Icon(Icons.add),
-            ),
+        // "add item" modal (dialog)
+        Future<Item> dialog = showDialog<Item>(
+            context: context,
+            builder: (BuildContext context) => new NewItemDialog(),
         );
+
+        dialog.then((Item item) async {
+            if (item != null)
+                setState(() {
+                    item.id = _items.length;
+                    _items.add(item);
+                });
+
+            String json = Item.listToJson(_items);
+            await (await _getItemFile()).writeAsString(json);
+        });
+        setState((){});
     }
 
 
-    Widget _buildItems() {
-        return new ListView.builder(
-            itemBuilder: _buildItem,
-            itemCount: _items.length,
-        );
+    Map<DismissDirection, double> _dismissThresholds() {
+        Map<DismissDirection, double> map = new Map<DismissDirection, double>();
+        map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
+        return map;
+    }
+
+
+    Future<File> _getItemFile() async {
+        String dir = (await getApplicationDocumentsDirectory()).path;
+        return new File("$dir/$FILENAME");
+    }
+
+
+    Future<List<Item>> _readItemData() async {
+        try {
+            File file = await _getItemFile();
+            String json = await file.readAsString();
+            List<Item> items = Item.listFromJson(json);
+            return items;
+        } on FileSystemException {
+            return <Item>[];
+        }
     }
 }
 
@@ -234,61 +235,6 @@ class ItemViewState extends State<ItemView> {
     void initState() {
         super.initState();
         itemEditingController = new TextEditingController(text: item.text);
-    }
-
-
-    void _setDone(bool value) {
-        setState(() {
-            item.done = value;
-            if (item.reminderSet)
-                item.deleteReminder();
-        });
-        _myHomePageState.update();
-    }
-
-
-    void _setText(String text) {
-        setState(() {
-            item.text = text;
-        });
-        _myHomePageState.update();
-    }
-
-
-    void _delete() {
-        setState(() {
-            _myHomePageState.setState(() {
-                _myHomePageState.delete(item);
-                _myHomePageState.update();
-                _myHomePageState.updateLocal();
-            });
-        });
-    }
-
-
-    void _showEditSheet() {
-        Future<bool> sheet = showModalBottomSheet<bool>(
-            context: context, 
-            builder: (BuildContext context) {
-                return new EditItemSheet(item);
-            }
-        );
-
-        sheet.then((bool editing) {
-            if (editing != null)
-                setState(() {
-                    this.editing = editing;
-                });
-
-            setState((){});
-        });
-    }
-
-
-    Map<DismissDirection, double> _dismissThresholds() {
-        Map<DismissDirection, double> map = new Map<DismissDirection, double>();
-        map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
-        return map;
     }
 
 
@@ -333,5 +279,60 @@ class ItemViewState extends State<ItemView> {
         }
         editing = false;
         return tile;
+    }
+
+
+    void _delete() {
+        setState(() {
+            _myHomePageState.setState(() {
+                _myHomePageState.delete(item);
+                _myHomePageState.update();
+                _myHomePageState.updateLocal();
+            });
+        });
+    }
+
+
+    Map<DismissDirection, double> _dismissThresholds() {
+        Map<DismissDirection, double> map = new Map<DismissDirection, double>();
+        map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
+        return map;
+    }
+
+
+    void _setDone(bool value) {
+        setState(() {
+            item.done = value;
+            if (item.reminderSet)
+                item.deleteReminder();
+        });
+        _myHomePageState.update();
+    }
+
+
+    void _setText(String text) {
+        setState(() {
+            item.text = text;
+        });
+        _myHomePageState.update();
+    }
+
+
+    void _showEditSheet() {
+        Future<bool> sheet = showModalBottomSheet<bool>(
+            context: context, 
+            builder: (BuildContext context) {
+                return new EditItemSheet(item);
+            }
+        );
+
+        sheet.then((bool editing) {
+            if (editing != null)
+                setState(() {
+                    this.editing = editing;
+                });
+
+            setState((){});
+        });
     }
 }

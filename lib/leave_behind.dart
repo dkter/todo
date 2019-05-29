@@ -13,8 +13,8 @@
 import 'package:flutter/material.dart';
  
  
-class LeaveBehindView extends StatelessWidget {
-    LeaveBehindView({Key key}): super(key: key);
+class LeaveBehindRightView extends StatelessWidget {
+    LeaveBehindRightView({Key key}): super(key: key);
  
     @override
     Widget build(BuildContext context) {
@@ -24,6 +24,25 @@ class LeaveBehindView extends StatelessWidget {
             child: new Row (
                 children: <Widget>[
                     new Icon(Icons.delete, color: Colors.white),
+                    new Expanded(
+                        child: new Text(''),
+                    ),
+                ],
+            ),
+        );
+    }
+}
+
+class LeaveBehindLeftView extends StatelessWidget {
+    LeaveBehindLeftView({Key key}): super(key: key);
+ 
+    @override
+    Widget build(BuildContext context) {
+        return new Container(
+            color: Colors.red,
+            padding: const EdgeInsets.all(16.0),
+            child: new Row (
+                children: <Widget>[
                     new Expanded(
                         child: new Text(''),
                     ),

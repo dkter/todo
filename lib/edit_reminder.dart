@@ -39,8 +39,8 @@ class EditReminderState extends State<EditReminderDialog> {
         super.initState();
         this.itemTextController = new TextEditingController();
         this.reminderSet = false;
-        this.reminderTime = this.item.notifTimeOfDay.replacing();  // calling replacing with no arguments copies the object
-        this.reminderDaysBefore = this.item.notifDaysBefore;
+        this.reminderTime = this.item.reminderTimeOfDay.replacing();  // calling replacing with no arguments copies the object
+        this.reminderDaysBefore = this.item.reminderDaysBefore;
     }
 
 
@@ -148,7 +148,7 @@ class EditReminderState extends State<EditReminderDialog> {
     Function _delete(BuildContext context) {
         return () {
             if (this.reminderTime != null) {
-                item.deleteNotification();
+                item.deleteReminder();
             }
 
             Navigator.pop(context);  // dismiss dialog
@@ -159,7 +159,7 @@ class EditReminderState extends State<EditReminderDialog> {
     Function _ok(BuildContext context) {
         return () {
             if (this.reminderTime != null) {
-                item.updateNotification(
+                item.updateReminder(
                     this.reminderTime,
                     this.reminderDaysBefore);
             }

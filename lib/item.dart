@@ -23,8 +23,8 @@ class Item {
     DateTime due;
     bool done = false;
     bool reminderSet = false;
-    TimeOfDay notifTimeOfDay;
-    int notifDaysBefore;
+    TimeOfDay reminderTimeOfDay;
+    int reminderDaysBefore;
 
     Item(this.id, this.text, this.due);
 
@@ -44,13 +44,13 @@ class Item {
 
             item.reminderSet = jsonItem["reminderSet"];
 
-            String notifTimeOfDay = jsonItem["notifTimeOfDay"];
-            if (notifTimeOfDay != null)
-                item.notifTimeOfDay = deserializeTimeOfDay(notifTimeOfDay);
+            String reminderTimeOfDay = jsonItem["notifTimeOfDay"];
+            if (reminderTimeOfDay != null)
+                item.reminderTimeOfDay = deserializeTimeOfDay(reminderTimeOfDay);
             else
-                item.notifTimeOfDay = null;
+                item.reminderTimeOfDay = null;
 
-            item.notifDaysBefore = jsonItem["notifDaysBefore"];
+            item.reminderDaysBefore = jsonItem["notifDaysBefore"];
 
             items.add(item);
         }
@@ -66,8 +66,8 @@ class Item {
             mapData["done"] = item.done;
             mapData["due"] = item.due?.toIso8601String();
             mapData["reminderSet"] = item.reminderSet;
-            mapData["notifTimeOfDay"] = serializeTimeOfDay(item.notifTimeOfDay);
-            mapData["notifDaysBefore"] = item.notifDaysBefore;
+            mapData["notifTimeOfDay"] = serializeTimeOfDay(item.reminderTimeOfDay);
+            mapData["notifDaysBefore"] = item.reminderDaysBefore;
             listData.add(mapData);
         }
         String jsonData = json.encode(listData);
@@ -76,58 +76,58 @@ class Item {
     }
 
 
-    void setNotification(TimeOfDay notifTimeOfDay, int notifDaysBefore) async {
+    void setReminder(TimeOfDay reminderTimeOfDay, int reminderDaysBefore) async {
         this.reminderSet = true;
-        this.notifTimeOfDay = notifTimeOfDay;
-        this.notifDaysBefore = notifDaysBefore;
+        this.reminderTimeOfDay = reminderTimeOfDay;
+        this.reminderDaysBefore = reminderDaysBefore;
 
-        DateTime notifDate = this.due.subtract(new Duration(days: notifDaysBefore));
-        DateTime notifTime = new DateTime(notifDate.year,
-                                          notifDate.month,
-                                          notifDate.day,
-                                          notifTimeOfDay.hour,
-                                          notifTimeOfDay.minute);
-        print("Setting reminder for $notifTime");
+        DateTime reminderDate = this.due.subtract(new Duration(days: reminderDaysBefore));
+        DateTime reminderTime = new DateTime(reminderDate.year,
+                                          reminderDate.month,
+                                          reminderDate.day,
+                                          reminderTimeOfDay.hour,
+                                          reminderTimeOfDay.minute);
+        print("Setting reminder for $reminderTime");
 
         await Notify.notificationPlugin.schedule(
             this.id,
             this.text,
-            "Due " + (notifDaysBefore == 0? "today" :
-                      (notifDaysBefore == 1? "tomorrow" :
-                       "in $notifDaysBefore days")),
-            notifTime,
+            "Due " + (reminderDaysBefore == 0? "today" :
+                      (reminderDaysBefore == 1? "tomorrow" :
+                       "in $reminderDaysBefore days")),
+            reminderTime,
             Notify.platformChannelSpecifics);
     }
 
-    void updateNotification([TimeOfDay notifTimeOfDay, int notifDaysBefore]) async {
-        notifTimeOfDay ??= this.notifTimeOfDay;
-        notifDaysBefore ??= this.notifDaysBefore;
-        this.notifTimeOfDay = notifTimeOfDay;
-        this.notifDaysBefore = notifDaysBefore;
+    void updateReminder([TimeOfDay reminderTimeOfDay, int reminderDaysBefore]) async {
+        reminderTimeOfDay ??= this.reminderTimeOfDay;
+        reminderDaysBefore ??= this.reminderDaysBefore;
+        this.reminderTimeOfDay = reminderTimeOfDay;
+        this.reminderDaysBefore = reminderDaysBefore;
 
-        // cancel old notification
-        this.deleteNotification();
+        // cancel old reminder
+        this.deleteReminder();
         this.reminderSet = true;
 
-        DateTime notifDate = this.due.subtract(new Duration(days: notifDaysBefore));
-        DateTime notifTime = new DateTime(notifDate.year,
-                                          notifDate.month,
-                                          notifDate.day,
-                                          notifTimeOfDay.hour,
-                                          notifTimeOfDay.minute);
-        print("Setting reminder for $notifTime");
+        DateTime reminderDate = this.due.subtract(new Duration(days: reminderDaysBefore));
+        DateTime reminderTime = new DateTime(reminderDate.year,
+                                          reminderDate.month,
+                                          reminderDate.day,
+                                          reminderTimeOfDay.hour,
+                                          reminderTimeOfDay.minute);
+        print("Setting reminder for $reminderTime");
 
         await Notify.notificationPlugin.schedule(
             this.id,
             this.text,
-            "Due " + (this.notifDaysBefore == 0? "today" :
-                      (this.notifDaysBefore == 1? "tomorrow" :
-                       "in ${this.notifDaysBefore} days")),
-            notifTime,
+            "Due " + (this.reminderDaysBefore == 0? "today" :
+                      (this.reminderDaysBefore == 1? "tomorrow" :
+                       "in ${this.reminderDaysBefore} days")),
+            reminderTime,
             Notify.platformChannelSpecifics);
     }
 
-    void deleteNotification() async {
+    void deleteReminder() async {
         this.reminderSet = false;
         await Notify.notificationPlugin.cancel(this.id);   
     }

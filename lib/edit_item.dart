@@ -29,14 +29,14 @@ class EditItemSheet extends StatefulWidget {
 
 
 class EditItemState extends State<EditItemSheet> {
+    static final double ICON_WIDTH = 16.0;
+
     final Item item;
     EditItemState(this.item);
 
     bool reminderSet = false;
     TimeOfDay reminderTime;
     int reminderDaysBefore;
-
-    static final double ICON_WIDTH = 16.0;
 
 
     @override
@@ -124,7 +124,7 @@ class EditItemState extends State<EditItemSheet> {
                         child: new Icon(Icons.alarm),
                     ),
                     title: new Text("Edit reminder"),
-                    subtitle: new Text("${item.notifDaysBefore} days before at ${item.notifTimeOfDay.format(context)}"),
+                    subtitle: new Text("${item.reminderDaysBefore} days before at ${item.reminderTimeOfDay.format(context)}"),
                     trailing: new IconButton(
                         icon: new Icon(
                             Icons.delete,
@@ -151,7 +151,7 @@ class EditItemState extends State<EditItemSheet> {
                 setState(() {
                     item.due = date;
                     if (item.reminderSet)
-                        item.updateNotification();
+                        item.updateReminder();
                 });
         });
     }
@@ -172,14 +172,14 @@ class EditItemState extends State<EditItemSheet> {
         setState(() {
             item.due = null;
             if (item.reminderSet) {
-                item.deleteNotification();
+                item.deleteReminder();
             }
         });
     }
 
     void _removeReminder() {
         setState(() {
-            item.deleteNotification();
+            item.deleteReminder();
         });
     }
 }

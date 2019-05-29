@@ -178,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int delete(Item item) {
         print("Deleting item: " + item.text);
-        item.deleteNotification();
+        item.deleteReminder();
         // Returns the index of the deleted item, for reinsertion purposes
         int index = _items.indexWhere((i) => i.id == item.id);
         _items.removeAt(index);
@@ -241,7 +241,7 @@ class ItemViewState extends State<ItemView> {
         setState(() {
             item.done = value;
             if (item.reminderSet)
-                item.deleteNotification();
+                item.deleteReminder();
         });
         _myHomePageState.update();
     }

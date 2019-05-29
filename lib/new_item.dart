@@ -213,7 +213,7 @@ class NewItemState extends State<NewItemDialog> {
                 var item = new Item(0, itemTextController.text, due);
 
                 if (this.reminderSet) {
-                    item.setNotification(
+                    item.setReminder(
                         this.reminderTime,
                         this.reminderDaysBefore);
                 }

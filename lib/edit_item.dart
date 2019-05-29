@@ -36,6 +36,8 @@ class EditItemState extends State<EditItemSheet> {
     TimeOfDay reminderTime;
     int reminderDaysBefore;
 
+    static final double ICON_WIDTH = 16.0;
+
 
     @override
     Widget build(BuildContext context) {
@@ -56,7 +58,11 @@ class EditItemState extends State<EditItemSheet> {
 
     Widget titleField(BuildContext context) {
         return new ListTile(
-            leading: new Icon(Icons.edit),
+            leading: new Container(
+                width: ICON_WIDTH,
+                alignment: Alignment.center,
+                child: new Icon(Icons.edit),
+            ),
             title: new Text("Edit title"),
             subtitle: new Text(item.text),
             onTap: () {
@@ -69,15 +75,31 @@ class EditItemState extends State<EditItemSheet> {
     Widget dueDateField(BuildContext context) {
         if (item.due == null)
             return new ListTile(
-                leading: new Icon(CustomIcons.calendar_add),
+                leading: new Container(
+                    width: ICON_WIDTH,
+                    alignment: Alignment.center,
+                    child: new Icon(CustomIcons.calendar_add),
+                ),
                 title: new Text("Add due date"),
                 onTap: _showDatePicker,
             );
         else
             return new ListTile(
-                leading: new Icon(Icons.event),
+                leading: new Container(
+                    width: ICON_WIDTH,
+                    alignment: Alignment.center,
+                    child: new Icon(Icons.event),
+                ),
                 title: new Text("Edit due date"),
                 subtitle: new Text(dateFormat.format(item.due)),
+                trailing: new IconButton(
+                    icon: new Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                    ),
+                    tooltip: "Remove due date",
+                    onPressed: _removeDueDate,
+                ),
                 onTap: _showDatePicker,
             );
     }
@@ -87,15 +109,31 @@ class EditItemState extends State<EditItemSheet> {
         if (item.due != null)
             if (!item.reminderSet)
                 return new ListTile(
-                    leading: new Icon(Icons.alarm_add),
+                    leading: new Container(
+                        width: ICON_WIDTH,
+                        alignment: Alignment.center,
+                        child: new Icon(Icons.alarm_add),
+                    ),
                     title: new Text("Add reminder"),
                     onTap: _showEditReminder,
                 );
             else
                 return new ListTile(
-                    leading: new Icon(Icons.alarm),
+                    leading: new Container(
+                        width: ICON_WIDTH,
+                        alignment: Alignment.center,
+                        child: new Icon(Icons.alarm),
+                    ),
                     title: new Text("Edit reminder"),
                     subtitle: new Text("${item.notifDaysBefore} days before at ${item.notifTimeOfDay.format(context)}"),
+                    trailing: new IconButton(
+                        icon: new Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                        ),
+                        tooltip: "Remove reminder",
+                        onPressed: _removeReminder,
+                    ),
                     onTap: _showEditReminder,
                 );
         else
@@ -129,6 +167,21 @@ class EditItemState extends State<EditItemSheet> {
 
         dialog.then((dynamic) async {
             setState((){});
+        });
+    }
+
+    void _removeDueDate() {
+        setState(() {
+            item.due = null;
+            if (item.reminderSet) {
+                item.deleteNotification();
+            }
+        });
+    }
+
+    void _removeReminder() {
+        setState(() {
+            item.deleteNotification();
         });
     }
 }

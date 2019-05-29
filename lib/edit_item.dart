@@ -95,7 +95,6 @@ class EditItemState extends State<EditItemSheet> {
                 trailing: new IconButton(
                     icon: new Icon(
                         Icons.delete,
-                        color: Colors.red,
                     ),
                     tooltip: "Remove due date",
                     onPressed: _removeDueDate,
@@ -129,7 +128,6 @@ class EditItemState extends State<EditItemSheet> {
                     trailing: new IconButton(
                         icon: new Icon(
                             Icons.delete,
-                            color: Colors.red,
                         ),
                         tooltip: "Remove reminder",
                         onPressed: _removeReminder,

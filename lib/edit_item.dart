@@ -11,11 +11,11 @@
  */
 
 import 'package:flutter/material.dart';
+import 'custom_icons_icons.dart';
+import 'edit_reminder.dart';
 import 'item.dart';
 import 'new_item.dart';
-import 'edit_reminder.dart';
 import 'util.dart';
-import 'custom_icons_icons.dart';
 
 
 class EditItemSheet extends StatefulWidget {

@@ -10,9 +10,9 @@
  * defined by the Mozilla Public License, v. 2.0.
  */
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dart:convert';
 import 'notify.dart';
 import 'util.dart';
 

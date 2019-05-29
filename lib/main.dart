@@ -10,14 +10,14 @@
  * defined by the Mozilla Public License, v. 2.0.
  */
 
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'edit_item.dart';
 import 'item.dart';
 import 'leave_behind.dart';
 import 'new_item.dart';
-import 'edit_item.dart';
 import 'notify.dart';
 import 'util.dart';
 

@@ -32,11 +32,13 @@ class EditItemState extends State<EditItemSheet> {
     static final double ICON_WIDTH = 16.0;
 
     final Item item;
-    EditItemState(this.item);
 
     bool reminderSet = false;
     TimeOfDay reminderTime;
     int reminderDaysBefore;
+
+
+    EditItemState(this.item);
 
 
     @override
@@ -47,16 +49,16 @@ class EditItemState extends State<EditItemSheet> {
                 mainAxisSize: MainAxisSize.min,
                 //crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                    this.titleField(context),
-                    this.dueDateField(context),
-                    this.reminderField(context),
+                    this._titleField(context),
+                    this._dueDateField(context),
+                    this._reminderField(context),
                 ],
             ),
         );
     }
 
 
-    Widget titleField(BuildContext context) {
+    Widget _titleField(BuildContext context) {
         return new ListTile(
             leading: new Container(
                 width: ICON_WIDTH,
@@ -72,7 +74,7 @@ class EditItemState extends State<EditItemSheet> {
     }
 
 
-    Widget dueDateField(BuildContext context) {
+    Widget _dueDateField(BuildContext context) {
         if (item.due == null)
             return new ListTile(
                 leading: new Container(
@@ -105,7 +107,7 @@ class EditItemState extends State<EditItemSheet> {
     }
 
 
-    Widget reminderField(BuildContext context) {
+    Widget _reminderField(BuildContext context) {
         if (item.due != null)
             if (!item.reminderSet)
                 return new ListTile(
@@ -141,6 +143,19 @@ class EditItemState extends State<EditItemSheet> {
     }
 
 
+    void _showEditReminder() {
+        // "add item" modal (dialog)
+        Future dialog = showDialog(
+            context: context,
+            builder: (BuildContext context) => new EditReminderDialog(this.item),
+        );
+
+        dialog.then((dynamic) async {
+            setState((){});
+        });
+    }
+
+
     void _showDatePicker() {
         DateTime now = DateTime.now();
         Future<DateTime> picker = showDatePicker(
@@ -158,17 +173,6 @@ class EditItemState extends State<EditItemSheet> {
         });
     }
 
-    void _showEditReminder() {
-        // "add item" modal (dialog)
-        Future dialog = showDialog(
-            context: context,
-            builder: (BuildContext context) => new EditReminderDialog(this.item),
-        );
-
-        dialog.then((dynamic) async {
-            setState((){});
-        });
-    }
 
     void _removeDueDate() {
         setState(() {
@@ -178,6 +182,7 @@ class EditItemState extends State<EditItemSheet> {
             }
         });
     }
+
 
     void _removeReminder() {
         setState(() {

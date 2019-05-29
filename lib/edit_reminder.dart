@@ -50,7 +50,7 @@ class EditReminderState extends State<EditReminderDialog> {
             title: Text(
                 (this.item.reminderSet? "Edit reminder" : "Add reminder"),
             ),
-            content: reminderSettings(context),
+            content: _reminderSettings(context),
             actions: <Widget>[
                 new FlatButton(
                     textColor: Colors.red,
@@ -70,22 +70,22 @@ class EditReminderState extends State<EditReminderDialog> {
     }
 
 
-    Widget reminderSettings(BuildContext context) {
+    Widget _reminderSettings(BuildContext context) {
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
                 new Text("Reminder"),
                 // Set number of days before
-                reminderDaysBeforeField(context),
+                this._reminderDaysBeforeField(context),
                 // Set time
-                reminderTimeField(context),
+                this._reminderTimeField(context),
             ],
         );
     }
 
 
-    Widget reminderDaysBeforeField(BuildContext context) {
+    Widget _reminderDaysBeforeField(BuildContext context) {
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -115,7 +115,7 @@ class EditReminderState extends State<EditReminderDialog> {
     }
 
 
-    Widget reminderTimeField(BuildContext context) {
+    Widget _reminderTimeField(BuildContext context) {
         return new Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

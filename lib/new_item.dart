@@ -47,9 +47,9 @@ class NewItemState extends State<NewItemDialog> {
             content: new SingleChildScrollView(
                 child: new ListBody(
                     children: <Widget>[
-                        this.titleField(context),
-                        this.dueDateField(context),
-                        this.reminderField(context),
+                        this._titleField(context),
+                        this._dueDateField(context),
+                        this._reminderField(context),
                     ],
                 ),
             ),
@@ -60,29 +60,29 @@ class NewItemState extends State<NewItemDialog> {
                 ),
                 new FlatButton(
                     child: new Text("Ok"),
-                    onPressed: ok(context),
+                    onPressed: _ok(context),
                 ),
             ],
         );
     }
 
 
-    Widget reminderSettings(BuildContext context) {
+    Widget _reminderSettings(BuildContext context) {
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
                 new Text("Reminder"),
                 // Set number of days before
-                reminderDaysBeforeField(context),
+                this._reminderDaysBeforeField(context),
                 // Set time
-                reminderTimeField(context),
+                this._reminderTimeField(context),
             ],
         );
     }
 
 
-    Widget titleField(BuildContext context) {
+    Widget _titleField(BuildContext context) {
         return new TextField(
             decoration: new InputDecoration(labelText: "Title"),
             controller: itemTextController,
@@ -91,7 +91,7 @@ class NewItemState extends State<NewItemDialog> {
     }
 
 
-    Widget dueDateField(BuildContext context) {
+    Widget _dueDateField(BuildContext context) {
         if (due == null)
             return new FlatButton(
                 textColor: Colors.blue,
@@ -117,10 +117,10 @@ class NewItemState extends State<NewItemDialog> {
     }
 
 
-    Widget reminderField(BuildContext context) {
+    Widget _reminderField(BuildContext context) {
         if (due != null) {
             if (this.reminderSet)
-                return this.reminderSettings(context);
+                return this._reminderSettings(context);
             else
                 return new FlatButton(
                     textColor: Colors.blue,
@@ -133,7 +133,7 @@ class NewItemState extends State<NewItemDialog> {
     }
 
 
-    Widget reminderDaysBeforeField(BuildContext context) {
+    Widget _reminderDaysBeforeField(BuildContext context) {
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -163,7 +163,7 @@ class NewItemState extends State<NewItemDialog> {
     }
 
 
-    Widget reminderTimeField(BuildContext context) {
+    Widget _reminderTimeField(BuildContext context) {
         return new Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -207,7 +207,7 @@ class NewItemState extends State<NewItemDialog> {
         });
     }
 
-    Function ok(BuildContext context) {
+    Function _ok(BuildContext context) {
         if (itemTextController.text != "") {
             return () {
                     var item = new Item(0, itemTextController.text, due);

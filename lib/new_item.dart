@@ -208,21 +208,23 @@ class NewItemState extends State<NewItemDialog> {
     }
 
     Function ok(BuildContext context) {
-        return () {
-            if (itemTextController.text != "") {
-                var item = new Item(0, itemTextController.text, due);
+        if (itemTextController.text != "") {
+            return () {
+                    var item = new Item(0, itemTextController.text, due);
 
-                if (this.reminderSet) {
-                    item.setReminder(
-                        this.reminderTime,
-                        this.reminderDaysBefore);
-                }
+                    if (this.reminderSet) {
+                        item.setReminder(
+                            this.reminderTime,
+                            this.reminderDaysBefore);
+                    }
 
-                setState(() {
-                    itemTextController.text = "";  // clear textbox,
-                });
-                Navigator.pop<Item>(context, item);  // dismiss dialog
+                    setState(() {
+                        itemTextController.text = "";  // clear textbox,
+                    });
+                    Navigator.pop<Item>(context, item);  // dismiss dialog
             };
-        };
+        }
+        else
+            return null;  // if the onPressed callback is null, the button is disabled
     }
 }

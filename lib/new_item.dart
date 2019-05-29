@@ -189,9 +189,10 @@ class NewItemState extends State<NewItemDialog> {
             firstDate: now,
             lastDate: DateTime(2030));
         picker.then((DateTime date) {
-            setState(() {
-                due = date;
-            });
+            if (date != null)
+                setState(() {
+                    due = date;
+                });
         });
     }
 

@@ -111,11 +111,12 @@ class EditItemState extends State<EditItemSheet> {
             firstDate: now,
             lastDate: DateTime(2030));
         picker.then((DateTime date) {
-            setState(() {
-                item.due = date;
-                if (item.reminderSet)
-                    item.updateNotification();
-            });
+            if (date != null)
+                setState(() {
+                    item.due = date;
+                    if (item.reminderSet)
+                        item.updateNotification();
+                });
         });
     }
 

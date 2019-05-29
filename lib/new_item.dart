@@ -185,9 +185,9 @@ class NewItemState extends State<NewItemDialog> {
         DateTime now = DateTime.now();
         Future<DateTime> picker = showDatePicker(
             context: context,
-            initialDate: now,
-            firstDate: now,
-            lastDate: DateTime(2030));
+            initialDate: this.due ?? now,
+            firstDate: now.subtract(new Duration(days: 1)),
+            lastDate: now.add(new Duration(days: DUE_DATE_LIMIT)));
         picker.then((DateTime date) {
             if (date != null)
                 setState(() {

@@ -240,6 +240,8 @@ class ItemViewState extends State<ItemView> {
     void _setDone(bool value) {
         setState(() {
             item.done = value;
+            if (item.reminderSet)
+                item.deleteNotification();
         });
         _myHomePageState.update();
     }

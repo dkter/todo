@@ -96,6 +96,7 @@ class EditItemState extends State<EditItemSheet> {
                     icon: new Icon(
                         Icons.delete,
                     ),
+                    alignment: Alignment.centerRight,
                     tooltip: "Remove due date",
                     onPressed: _removeDueDate,
                 ),
@@ -129,6 +130,7 @@ class EditItemState extends State<EditItemSheet> {
                         icon: new Icon(
                             Icons.delete,
                         ),
+                        alignment: Alignment.centerRight,
                         tooltip: "Remove reminder",
                         onPressed: _removeReminder,
                     ),

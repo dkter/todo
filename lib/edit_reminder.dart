@@ -39,8 +39,8 @@ class EditReminderState extends State<EditReminderDialog> {
         super.initState();
         this.itemTextController = new TextEditingController();
         this.reminderSet = false;
-        this.reminderTime = new TimeOfDay(hour: 15, minute: 0);
-        this.reminderDaysBefore = 1;
+        this.reminderTime = this.item.notifTimeOfDay.replacing();  // calling replacing with no arguments copies the object
+        this.reminderDaysBefore = this.item.notifDaysBefore;
     }
 
 

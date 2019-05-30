@@ -275,7 +275,7 @@ class ItemViewState extends State<ItemView> {
         else {
             Widget subtitle = null;
             if (item.due != null) {
-                if (today.compareTo(item.due) > 0)
+                if (today.compareTo(item.due) > 0 && !item.done)
                     subtitle = new Text(
                         "Due ${dateFormat.format(item.due)} (overdue)",
                         style: new TextStyle(color: Colors.red)

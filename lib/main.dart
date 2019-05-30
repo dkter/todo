@@ -157,7 +157,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 Scaffold.of(context).showSnackBar(deletion_snackbar);
             },
             resizeDuration: null,
-            dismissThresholds: _dismissThresholds(),
             background: new LeaveBehindRightView(),
             secondaryBackground: new LeaveBehindLeftView(),
             child: new ItemView(item),
@@ -185,13 +184,6 @@ class _MyHomePageState extends State<MyHomePage> {
             await (await _getItemFile()).writeAsString(json);
         });
         setState((){});
-    }
-
-
-    Map<DismissDirection, double> _dismissThresholds() {
-        Map<DismissDirection, double> map = new Map<DismissDirection, double>();
-        map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
-        return map;
     }
 
 
@@ -305,13 +297,6 @@ class ItemViewState extends State<ItemView> {
                 _myHomePageState.updateLocal();
             });
         });
-    }
-
-
-    Map<DismissDirection, double> _dismissThresholds() {
-        Map<DismissDirection, double> map = new Map<DismissDirection, double>();
-        map.putIfAbsent(DismissDirection.horizontal, () => 0.5);
-        return map;
     }
 
 

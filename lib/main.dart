@@ -78,6 +78,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     @override
     Widget build(BuildContext context) {
+        this._items.sort();
+
         return new Scaffold(
             appBar: new AppBar(
                 title: new Text(widget.title),

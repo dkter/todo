@@ -17,7 +17,7 @@ import 'notify.dart';
 import 'util.dart';
 
 
-class Item {
+class Item implements Comparable<Item> {
     int id;
     String text;
     DateTime due;
@@ -73,6 +73,46 @@ class Item {
         String jsonData = json.encode(listData);
         print(jsonData);
         return jsonData;
+    }
+
+
+    int compareTo(Item other) {
+        // from most recent due date to least recent (no due date last), then alphabetic, then by id
+        // returns -1 if this < other, 1 if other < this
+        if (this.due == null) {
+            if (other.due == null) {
+                if (this.text.compareTo(other.text) != 0)
+                    return this.text.compareTo(other.text);
+                else {
+                    if (this.id < other.id)
+                        return -1;
+                    else
+                        return 1;
+                }
+            }
+            else {
+                return 1;
+            }
+        }
+        else if (other.due == null) {
+            return -1;
+        }
+        else if (this.due.compareTo(other.due) < 0) {
+            return -1;
+        }
+        else if (this.due.compareTo(other.due) > 0) {
+            return 1;
+        }
+        else {
+            if (this.text.compareTo(other.text) != 0)
+                return this.text.compareTo(other.text);
+            else {
+                if (this.id < other.id)
+                    return -1;
+                else
+                    return 1;
+            }
+        }
     }
 
 

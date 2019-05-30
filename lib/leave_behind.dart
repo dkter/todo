@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
  
  
 class LeaveBehindRightView extends StatelessWidget {
+    // View that is shown when the items are swiped away to the right
     LeaveBehindRightView({Key key}): super(key: key);
  
     @override
@@ -34,6 +35,7 @@ class LeaveBehindRightView extends StatelessWidget {
 }
 
 class LeaveBehindLeftView extends StatelessWidget {
+    // View that is shown when the items are swiped away to the left
     LeaveBehindLeftView({Key key}): super(key: key);
  
     @override

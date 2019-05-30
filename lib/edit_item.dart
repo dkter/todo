@@ -76,6 +76,7 @@ class EditItemState extends State<EditItemSheet> {
 
     Widget _dueDateField(BuildContext context) {
         if (item.due == null)
+            // Button to add a due date
             return new ListTile(
                 leading: new Container(
                     width: ICON_WIDTH,
@@ -86,6 +87,7 @@ class EditItemState extends State<EditItemSheet> {
                 onTap: _showDatePicker,
             );
         else
+            // Button to edit the existing due date
             return new ListTile(
                 leading: new Container(
                     width: ICON_WIDTH,
@@ -110,6 +112,7 @@ class EditItemState extends State<EditItemSheet> {
     Widget _reminderField(BuildContext context) {
         if (item.due != null)
             if (!item.reminderSet)
+                // Button to add a reminder
                 return new ListTile(
                     leading: new Container(
                         width: ICON_WIDTH,
@@ -120,6 +123,7 @@ class EditItemState extends State<EditItemSheet> {
                     onTap: _showEditReminder,
                 );
             else
+                // Button to edit the existing reminder
                 return new ListTile(
                     leading: new Container(
                         width: ICON_WIDTH,
@@ -139,6 +143,7 @@ class EditItemState extends State<EditItemSheet> {
                     onTap: _showEditReminder,
                 );
         else
+            // If there's no due date set, there shouldn't be a reminder field
             return new Center();
     }
 
@@ -160,15 +165,16 @@ class EditItemState extends State<EditItemSheet> {
         DateTime now = DateTime.now();
         Future<DateTime> picker = showDatePicker(
             context: context,
-            initialDate: this.item.due ?? now,
-            firstDate: now.subtract(new Duration(days: 1)),
-            lastDate: now.add(new Duration(days: DUE_DATE_LIMIT)));
+            initialDate: this.item.due ?? now,                          // existing due date if set, otherwise now
+            firstDate: now.subtract(new Duration(days: 1)),             // it actually starts the day after the passed day, for some reason
+            lastDate: now.add(new Duration(days: DUE_DATE_LIMIT)));     // DUE_DATE_LIMIT days from today
+
         picker.then((DateTime date) {
             if (date != null)
                 setState(() {
                     item.due = date;
                     if (item.reminderSet)
-                        item.updateReminder();
+                        item.updateReminder();      // update relative reminder now that there's a new date
                 });
         });
     }

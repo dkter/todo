@@ -4,10 +4,12 @@ import "package:intl/intl.dart";
 var dateFormat = new DateFormat.yMMMd();
 var DUE_DATE_LIMIT = 365 * 100;  // days
 
+
 String serializeTimeOfDay(TimeOfDay tod) {
     if (tod == null) return null;
     return "${tod.hour}:${tod.minute.toString().padLeft(2, '0')}";
 }
+
 
 TimeOfDay deserializeTimeOfDay(String serialized) {
     var hm = serialized.split(":");

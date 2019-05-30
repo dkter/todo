@@ -12,8 +12,10 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import 'edit_item.dart';
 import 'item.dart';
 import 'leave_behind.dart';
@@ -95,7 +97,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     int delete(Item item) {
-        print("Deleting item: " + item.text);
         item.deleteReminder();
         // Returns the index of the deleted item, for reinsertion purposes
         int index = _items.indexWhere((i) => i.id == item.id);
@@ -105,6 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     void update() {
+        // Write item data to JSON file
         String json = Item.listToJson(_items);
         _getItemFile().then((File file) {
             file.writeAsString(json);
@@ -113,6 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     void updateLocal() {
+        // Grab updated item data from JSON file
         _readItemData().then((List<Item> items) {
             setState(() {
                 _items = items;
@@ -131,35 +134,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Widget _buildItem(BuildContext context, int index) {
         Item item = _items[index];
-        return new Dismissible(
+        print("${item.id} -> ${item.text}");
+        return new Dismissible(         // allows the child ItemView to be swiped away
+            child: new ItemView(item),
             key: new Key(item.id.toString()),
             direction: DismissDirection.horizontal,
-            onDismissed: (DismissDirection direction) {
-                int deleted_index;
-                setState(() {
-                    deleted_index = delete(item);
-                });
-
-                var deletion_snackbar = new SnackBar(
-                    content: new Text(item.text + " deleted"),
-                    action: new SnackBarAction(
-                        label: 'Undo',
-                        onPressed: () {
-                            setState(() {
-                                // reinsert item
-                                _items.insert(deleted_index, item);
-                            });
-                        }
-                    )
-                );
-
-                update();
-                Scaffold.of(context).showSnackBar(deletion_snackbar);
-            },
+            onDismissed: _dismiss(context, item),
             resizeDuration: null,
             background: new LeaveBehindRightView(),
             secondaryBackground: new LeaveBehindLeftView(),
-            child: new ItemView(item),
         );
     }
 
@@ -176,7 +159,11 @@ class _MyHomePageState extends State<MyHomePage> {
         dialog.then((Item item) async {
             if (item != null)
                 setState(() {
-                    item.id = _items.length;
+                    // find max id, add 1
+                    var maxId = _items.reduce(
+                        (a, b) => a.id > b.id ? a : b
+                    ).id;
+                    item.id = maxId + 1;
                     _items.add(item);
                 });
 
@@ -187,13 +174,42 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
 
+    Function _dismiss(BuildContext context, Item item) {
+        return (DismissDirection direction) {
+            // Occurs when the user swipes away an item
+            int deleted_index;
+            setState(() {
+                deleted_index = delete(item);
+            });
+
+            var deletion_snackbar = new SnackBar(
+                content: new Text(item.text + " deleted"),
+                action: new SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                        setState(() {
+                            // reinsert item
+                            _items.insert(deleted_index, item);
+                        });
+                    }
+                )
+            );
+
+            update();
+            Scaffold.of(context).showSnackBar(deletion_snackbar);
+        };
+    }
+
+
     Future<File> _getItemFile() async {
+        // Find the path of the JSON storage file
         String dir = (await getApplicationDocumentsDirectory()).path;
         return new File("$dir/$FILENAME");
     }
 
 
     Future<List<Item>> _readItemData() async {
+        // Read data from the JSON storage file
         try {
             File file = await _getItemFile();
             String json = await file.readAsString();
@@ -219,8 +235,8 @@ class ItemView extends StatefulWidget {
 class ItemViewState extends State<ItemView> {
     Item item;
     bool editing = false;
-    // controller for the item editing view
-    TextEditingController itemEditingController;
+    TextEditingController itemEditingController; // controller for the item editing view
+
 
     ItemViewState(this.item);
 
@@ -241,6 +257,7 @@ class ItemViewState extends State<ItemView> {
         Widget tile;
 
         if (editing)
+            // Replace the default tile with an inline text box for editing the item's text
             tile = new ListTile(
                 title: new TextField(
                     controller: itemEditingController,

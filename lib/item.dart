@@ -30,6 +30,7 @@ class Item implements Comparable<Item> {
 
 
     static List<Item> listFromJson(String json_obj) {
+        // Parse a JSON object and return a list of items
         List<Item> items = <Item>[];
         List parsedList = json.decode(json_obj);
         for (var jsonItem in parsedList) {
@@ -59,6 +60,7 @@ class Item implements Comparable<Item> {
 
 
     static String listToJson(List<Item> items) {
+        // Serialize a list of items into a JSON object
         List<Map> listData = <Map>[];
         for (var item in items){
             var mapData = new Map();
@@ -84,10 +86,7 @@ class Item implements Comparable<Item> {
                 if (this.text.compareTo(other.text) != 0)
                     return this.text.compareTo(other.text);
                 else {
-                    if (this.id < other.id)
-                        return -1;
-                    else
-                        return 1;
+                    return this.id.compareTo(other.id);
                 }
             }
             else {
@@ -107,10 +106,7 @@ class Item implements Comparable<Item> {
             if (this.text.compareTo(other.text) != 0)
                 return this.text.compareTo(other.text);
             else {
-                if (this.id < other.id)
-                    return -1;
-                else
-                    return 1;
+                return this.id.compareTo(other.id);
             }
         }
     }
@@ -140,31 +136,20 @@ class Item implements Comparable<Item> {
     }
 
     void updateReminder([TimeOfDay reminderTimeOfDay, int reminderDaysBefore]) async {
+        // If reminderTimeOfDay and reminderDaysBefore are passed, the instance variables should be
+        // updated with the new values. If not, the reminder should be updated with the existing
+        // values (maybe the due date changed)
         reminderTimeOfDay ??= this.reminderTimeOfDay;
         reminderDaysBefore ??= this.reminderDaysBefore;
         this.reminderTimeOfDay = reminderTimeOfDay;
         this.reminderDaysBefore = reminderDaysBefore;
 
-        // cancel old reminder
+        // Cancel the old reminder
         this.deleteReminder();
         this.reminderSet = true;
 
-        DateTime reminderDate = this.due.subtract(new Duration(days: reminderDaysBefore));
-        DateTime reminderTime = new DateTime(reminderDate.year,
-                                          reminderDate.month,
-                                          reminderDate.day,
-                                          reminderTimeOfDay.hour,
-                                          reminderTimeOfDay.minute);
-        print("Setting reminder for $reminderTime");
-
-        await Notify.notificationPlugin.schedule(
-            this.id,
-            this.text,
-            "Due " + (this.reminderDaysBefore == 0? "today" :
-                      (this.reminderDaysBefore == 1? "tomorrow" :
-                       "in ${this.reminderDaysBefore} days")),
-            reminderTime,
-            Notify.platformChannelSpecifics);
+        // Set a new reminder
+        this.setReminder(reminderTimeOfDay, reminderDaysBefore);
     }
 
     void deleteReminder() async {

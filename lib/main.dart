@@ -242,7 +242,12 @@ class ItemViewState extends State<ItemView> {
 
     @override
     Widget build(BuildContext context) {
+        // For comparison purposes, create a DateTime with the start of the current day
+        var now = DateTime.now();
+        var today = DateTime(now.year, now.month, now.day);
+
         Widget tile;
+
         if (editing)
             tile = new ListTile(
                 title: new TextField(
@@ -261,7 +266,15 @@ class ItemViewState extends State<ItemView> {
         else {
             Widget subtitle = null;
             if (item.due != null) {
-                subtitle = new Text("Due " + dateFormat.format(item.due));
+                if (today.compareTo(item.due) > 0)
+                    subtitle = new Text(
+                        "Due ${dateFormat.format(item.due)} (overdue)",
+                        style: new TextStyle(color: Colors.red)
+                    );
+                else
+                    subtitle = new Text(
+                        "Due ${dateFormat.format(item.due)}",
+                    );
             }
 
             tile = new ListTile(

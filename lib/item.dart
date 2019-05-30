@@ -73,7 +73,6 @@ class Item implements Comparable<Item> {
             listData.add(mapData);
         }
         String jsonData = json.encode(listData);
-        print(jsonData);
         return jsonData;
     }
 

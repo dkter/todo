@@ -86,7 +86,7 @@ class NewItemState extends State<NewItemDialog> {
         return new TextField(
             decoration: new InputDecoration(labelText: "Title"),
             controller: itemTextController,
-            onChanged: (String s){setState((){});},
+            onChanged: (String s){setState((){});},  // refresh the state
         );
     }
 
@@ -99,6 +99,7 @@ class NewItemState extends State<NewItemDialog> {
                 onPressed: _showDatePicker,
             );
         else
+            // Display for due date and button to select the date
             return new Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
@@ -120,8 +121,10 @@ class NewItemState extends State<NewItemDialog> {
     Widget _reminderField(BuildContext context) {
         if (due != null) {
             if (this.reminderSet)
+                // Entire settings widget
                 return this._reminderSettings(context);
             else
+                // Button to add a reminder
                 return new FlatButton(
                     textColor: Colors.blue,
                     child: new Text("Add reminder"),
@@ -134,6 +137,7 @@ class NewItemState extends State<NewItemDialog> {
 
 
     Widget _reminderDaysBeforeField(BuildContext context) {
+        // Display and slider to select the number of days before the due date to show the reminder
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -164,6 +168,7 @@ class NewItemState extends State<NewItemDialog> {
 
 
     Widget _reminderTimeField(BuildContext context) {
+        // Display and button to show time picker for reminder
         return new Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -185,13 +190,14 @@ class NewItemState extends State<NewItemDialog> {
         DateTime now = DateTime.now();
         Future<DateTime> picker = showDatePicker(
             context: context,
-            initialDate: this.due ?? now,
-            firstDate: now.subtract(new Duration(days: 1)),
-            lastDate: now.add(new Duration(days: DUE_DATE_LIMIT)));
+            initialDate: this.due ?? now,                               // working due date if set, otherwise now
+            firstDate: now.subtract(new Duration(days: 1)),             // it actually starts the day after the passed day, for some reason
+            lastDate: now.add(new Duration(days: DUE_DATE_LIMIT)));     // DUE_DATE_LIMIT days from today
+
         picker.then((DateTime date) {
             if (date != null)
                 setState(() {
-                    due = date;
+                    due = date;  // will be used to create an item if the user presses the Ok button
                 });
         });
     }
@@ -200,9 +206,10 @@ class NewItemState extends State<NewItemDialog> {
         Future<TimeOfDay> picker = showTimePicker(
             context: context,
             initialTime: TimeOfDay.now());
+
         picker.then((TimeOfDay time) {
             setState(() {
-                reminderTime = time ?? reminderTime;
+                reminderTime = time ?? reminderTime;   // if the user pressed cancel, don't delete the existing time
             });
         });
     }
@@ -210,18 +217,18 @@ class NewItemState extends State<NewItemDialog> {
     Function _ok(BuildContext context) {
         if (itemTextController.text != "") {
             return () {
-                    var item = new Item(0, itemTextController.text, due);
+                var item = new Item(0, itemTextController.text, due);
 
-                    if (this.reminderSet) {
-                        item.setReminder(
-                            this.reminderTime,
-                            this.reminderDaysBefore);
-                    }
+                if (this.reminderSet) {
+                    item.setReminder(
+                        this.reminderTime,
+                        this.reminderDaysBefore);
+                }
 
-                    setState(() {
-                        itemTextController.text = "";  // clear textbox,
-                    });
-                    Navigator.pop<Item>(context, item);  // dismiss dialog
+                setState(() {
+                    itemTextController.text = "";  // clear textbox,
+                });
+                Navigator.pop<Item>(context, item);  // dismiss dialog
             };
         }
         else

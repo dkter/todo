@@ -86,6 +86,7 @@ class EditReminderState extends State<EditReminderDialog> {
 
 
     Widget _reminderDaysBeforeField(BuildContext context) {
+        // Display and slider to select the number of days before the due date to show the reminder
         return new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -116,6 +117,7 @@ class EditReminderState extends State<EditReminderDialog> {
 
 
     Widget _reminderTimeField(BuildContext context) {
+        // Display and button to show time picker for reminder
         return new Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -137,15 +139,17 @@ class EditReminderState extends State<EditReminderDialog> {
         Future<TimeOfDay> picker = showTimePicker(
             context: context,
             initialTime: TimeOfDay.now());
+
         picker.then((TimeOfDay time) {
             setState(() {
-                reminderTime = time ?? reminderTime;
+                reminderTime = time ?? reminderTime;   // if the user pressed cancel, don't delete the existing time
             });
         });
     }
 
 
     Function _delete(BuildContext context) {
+        // When the user presses the delete button, delete the reminder entirely
         return () {
             if (this.reminderTime != null) {
                 item.deleteReminder();

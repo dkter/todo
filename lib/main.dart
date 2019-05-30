@@ -134,7 +134,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Widget _buildItem(BuildContext context, int index) {
         Item item = _items[index];
-        print("${item.id} -> ${item.text}");
         return new Dismissible(         // allows the child ItemView to be swiped away
             child: new ItemView(item),
             key: new Key(item.id.toString()),

@@ -157,11 +157,15 @@ class _MyHomePageState extends State<MyHomePage> {
         dialog.then((Item item) async {
             if (item != null)
                 setState(() {
-                    // find max id, add 1
-                    var maxId = _items.reduce(
-                        (a, b) => a.id > b.id ? a : b
-                    ).id;
-                    item.id = maxId + 1;
+                    if (_items.length == 0)
+                        item.id = 0;
+                    else {
+                        // find max id, add 1
+                        var maxId = _items.reduce(
+                            (a, b) => a.id > b.id ? a : b
+                        ).id;
+                        item.id = maxId + 1;
+                    }
                     _items.add(item);
                 });
 

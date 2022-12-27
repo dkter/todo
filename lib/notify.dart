@@ -16,7 +16,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
 class Notify {
-    static Future<dynamic> onSelectNotification(String text) {
+    static void onSelectNotification(NotificationResponse details) {
 
     }
 
@@ -24,27 +24,29 @@ class Notify {
 
     static var initializationSettingsAndroid =
             new AndroidInitializationSettings('ic_notif');
-    static var initializationSettingsIOS = new IOSInitializationSettings();
+    static var initializationSettingsDarwin = new DarwinInitializationSettings();
     static var initializationSettings = new InitializationSettings(
-            initializationSettingsAndroid, initializationSettingsIOS);
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsDarwin,
+    );
 
     static var androidChannelSpecifics = new AndroidNotificationDetails(
             "reminders",
             "Task reminders",
-            "Scheduled reminders to complete tasks",
-            importance: Importance.Max,
-            priority: Priority.High);
+            channelDescription: "Scheduled reminders to complete tasks",
+            importance: Importance.max,
+            priority: Priority.high);
 
-    static var iOSChannelSpecifics = new IOSNotificationDetails();
+    //static var iOSChannelSpecifics = new IOSNotificationDetails();
 
     static var platformChannelSpecifics = new NotificationDetails(
-            androidChannelSpecifics,
-            iOSChannelSpecifics);
+            android: androidChannelSpecifics);//,
+            //iOS: iOSChannelSpecifics);
 
     static void initialize() {
         // Initialize the flutter_local_notifications plugin
         Notify.notificationPlugin.initialize(
             Notify.initializationSettings,
-            onSelectNotification: Notify.onSelectNotification);
+            onDidReceiveNotificationResponse: Notify.onSelectNotification);
     }
 }

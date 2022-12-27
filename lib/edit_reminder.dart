@@ -52,16 +52,18 @@ class EditReminderState extends State<EditReminderDialog> {
             ),
             content: _reminderSettings(context),
             actions: <Widget>[
-                new FlatButton(
-                    textColor: Colors.red,
+                new TextButton(
+                    style: TextButton.styleFrom(
+                        primary: Colors.red,
+                    ),
                     child: new Text("Delete"),
                     onPressed: _delete(context),
                 ),
-                new FlatButton(
+                new TextButton(
                     child: new Text("Cancel"),
                     onPressed: Navigator.of(context).pop,  // dismiss dialog
                 ),
-                new FlatButton(
+                new TextButton(
                     child: new Text("Ok"),
                     onPressed: _ok(context),
                 ),
@@ -94,7 +96,7 @@ class EditReminderState extends State<EditReminderDialog> {
                 new Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                        new FlatButton(
+                        new TextButton(
                             child: new Text(reminderDaysBefore == 1? "1 day before due date" : "$reminderDaysBefore days before due date"),
                             onPressed: _showTimePicker,
                         ),
@@ -121,12 +123,14 @@ class EditReminderState extends State<EditReminderDialog> {
         return new Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-                new FlatButton(
+                new TextButton(
                     child: new Text("Time: ${reminderTime.format(context)}"),
                     onPressed: _showTimePicker,
                 ),
-                new FlatButton(
-                    textColor: Colors.blue,
+                new TextButton(
+                    style: TextButton.styleFrom(
+                        primary: Colors.blue,
+                    ),
                     child: new Text("Change"),
                     onPressed: _showTimePicker,
                 ),

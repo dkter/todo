@@ -9,3 +9,8 @@ ios/.generated/
 packages
 .flutter-plugins
 key.properties
+local.properties
+.dart_tool/
+.flutter-plugins-dependencies
+.gradle
+ios/Flutter/flutter_export_environment.sh

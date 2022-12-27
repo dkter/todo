@@ -54,11 +54,11 @@ class NewItemState extends State<NewItemDialog> {
                 ),
             ),
             actions: <Widget>[
-                new FlatButton(
+                new TextButton(
                     child: new Text("Cancel"),
                     onPressed: Navigator.of(context).pop,  // dismiss dialog
                 ),
-                new FlatButton(
+                new TextButton(
                     child: new Text("Ok"),
                     onPressed: _ok(context),
                 ),
@@ -93,8 +93,10 @@ class NewItemState extends State<NewItemDialog> {
 
     Widget _dueDateField(BuildContext context) {
         if (due == null)
-            return new FlatButton(
-                textColor: Colors.blue,
+            return new TextButton(
+                style: TextButton.styleFrom(
+                    primary: Colors.blue,
+                ),
                 child: new Text("Add due date"),
                 onPressed: _showDatePicker,
             );
@@ -104,12 +106,14 @@ class NewItemState extends State<NewItemDialog> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                    new FlatButton(
+                    new TextButton(
                         child: new Text("Due " + dateFormat.format(due)),
                         onPressed: _showDatePicker,
                     ),
-                    new FlatButton(
-                        textColor: Colors.blue,
+                    new TextButton(
+                        style: TextButton.styleFrom(
+                            primary: Colors.blue,
+                        ),
                         child: new Text("Change"),
                         onPressed: _showDatePicker,
                     ),
@@ -125,8 +129,10 @@ class NewItemState extends State<NewItemDialog> {
                 return this._reminderSettings(context);
             else
                 // Button to add a reminder
-                return new FlatButton(
-                    textColor: Colors.blue,
+                return new TextButton(
+                    style: TextButton.styleFrom(
+                        primary: Colors.blue,
+                    ),
                     child: new Text("Add reminder"),
                     onPressed: (){ setState((){ this.reminderSet = true; }); },
                 );
@@ -145,7 +151,7 @@ class NewItemState extends State<NewItemDialog> {
                 new Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                        new FlatButton(
+                        new TextButton(
                             child: new Text(reminderDaysBefore == 1? "1 day before due date" : "$reminderDaysBefore days before due date"),
                             onPressed: _showTimePicker,
                         ),
@@ -172,12 +178,14 @@ class NewItemState extends State<NewItemDialog> {
         return new Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-                new FlatButton(
+                new TextButton(
                     child: new Text("Time: ${reminderTime.format(context)}"),
                     onPressed: _showTimePicker,
                 ),
-                new FlatButton(
-                    textColor: Colors.blue,
+                new TextButton(
+                    style: TextButton.styleFrom(
+                        primary: Colors.blue,
+                    ),
                     child: new Text("Change"),
                     onPressed: _showTimePicker,
                 ),
